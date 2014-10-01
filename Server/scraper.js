@@ -8,6 +8,12 @@ require("../binnedData.js");
 require("./database.js");
 require("./couchAccess.js");
 _ = require("underscore");
+// New logging library implementation
+
+console = require('better-console');
+
+// }}} SETUP
+
 
 red = '\033[31m';
 yellow = '\033[33m';
@@ -15,6 +21,8 @@ magenta = '\033[35m';
 blue = '\033[36m';
 reset = '\033[0m';
 // SETUP }}}
+
+console.log("scraper.js loaded");
 
 // {{{ GLOBAL VARIABLES
 var MAX_NUMBER_OF_BIN_LEVELS = 46; // keep sync'd with ../binnedChart.js and scraper.js
@@ -47,21 +55,31 @@ var end_month = parseInt(process.argv[7])-1;
 var end_day   = parseInt(process.argv[8]);
 var end_hour  = parseInt(process.argv[9]);
 var sensorNumber  = parseInt(process.argv[10]);
+
+// TODO setup some debugging input
+
 // COMMAND LINE INPUT }}}
 
 // {{{ WHERE TO WALK
+
+
+// This variable is making the description required.
 var lowestLevelToKeep = 6;
 
+// The getTime() returns the number of milliseconds from the Unix epoch. 
+var RANGE_BUFFER = 10000;
 var rangeToWalk = [(new Date(start_year, start_month, start_day, start_hour)).getTime(),
     (new Date(end_year, end_month, end_day, end_hour)).getTime()];
 
-rangeToWalk[0] -= 10000; // buffer
-rangeToWalk[1] += 10000; // buffer
+rangeToWalk[0] -= RANGE_BUFFER; // buffer
+rangeToWalk[1] += RANGE_BUFFER; // buffer
 
+// This covers submitting two times that overlap
 if (rangeToWalk[0] >= rangeToWalk[1]) {
-    console.log("scraper - we already have that time span");
+		console.info("scraper - we already have that time span");
     return;
 }
+
 // WHERE TO WALK }}}
 
 // {{{ ASYNC
@@ -69,12 +87,16 @@ if (rangeToWalk[0] >= rangeToWalk[1]) {
 function sendQuerySync(item, callback) {
     getDataFromDataBaseInRange(item, item + STEP_SIZE, sensorNumber, "girder", function (queryResult) {
         // Bin the new data
-        console.log("scraper - data received. binning data...");
+				console.log("scraper - data received. binning data...");
         if(queryResult == null) {
+						console.info("scraper - queryResult == null");
             callback();
             return;
         }
         try {
+            console.log(queryResult);
+
+
             binData.addRawData(queryResult);
 
             // Delete the bottom few levels
@@ -102,8 +124,9 @@ function series(item, func) {
 
 // Final task (same in all the examples)
 function final() {
-    console.log('scraper - Done');
+		console.info('scraper - Done');
     //process.exit(0);
+
 }
 // ASYNC }}}
 
@@ -113,6 +136,8 @@ for(var i = rangeToWalk[0]; i < rangeToWalk[1]; i = i + STEP_SIZE) {
     walk_steps.push(i);
 }
 
+console.log(walk_steps);
+
 // Run the series
 series(walk_steps.shift(), sendQuerySync);
 // RUN }}}
@@ -121,7 +146,7 @@ series(walk_steps.shift(), sendQuerySync);
 var listOfThingsToDo = [];
 
 function saveIt(callback) { // TODO: implement callback (perhaps not worth it)
-    console.log("scraper - saving to database...")
+    console.info("scraper - saving to database...")
     var dummykey = "average";
     for (var l = lowestLevelToKeep; l < MAX_NUMBER_OF_BIN_LEVELS; l++) { // for each level
         for (var c in binData.bd()[dummykey].levels[l]) { // for each bin container
@@ -140,7 +165,7 @@ function saveIt(callback) { // TODO: implement callback (perhaps not worth it)
 
     function doIt(item, callback) {
         var id = makeIDString(item[0], item[1], item[2], item[3], item[4]);
-        //console.log("saving:", id, "to couchDB");
+        console.info("saving:", id, "to couchDB");
         saveWithMergeToCouch(item[0], item[1], item[2], item[3], item[4], item[5], callback);
     }
 
