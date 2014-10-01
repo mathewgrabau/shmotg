@@ -11,7 +11,14 @@ var winston = require("winston");
 
 require('winston-loggly');
 
-require("loggly-conf.js");
+require("./loggly-conf.js");
+
+// Check to see if the configuration object is defined.
+if (typeof loggly_configuration === 'undefined') {
+  throw "Loggly configuration not defined";
+}
+
+winston.add(winston.transports.Loggly, loggly_configuration);
 
 red = '\033[31m';
 yellow = '\033[33m';

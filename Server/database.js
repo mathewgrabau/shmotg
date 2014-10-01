@@ -9,6 +9,15 @@ var mysql = require('mysql');
 d3 = require("d3");
 require("../binnedData.js");
 
+// Implement the logging using winston.js here.
+winston = require("winston");
+require("winston-loggly");
+
+console = require("better-console");
+
+
+winston.log("Running the database.js");
+
 red = '\033[31m';
 yellow = '\033[33m';
 magenta = '\033[35m';
@@ -103,16 +112,48 @@ function combineWithoutDuplicates(arr1, arr2) {
     return arr1.concat(uniques);
 }
 
+// NOTE: The sensor type is either strap or girder.
 makeQuery = function(a, b, letter, sensorNumber, sensorType) {
+  // RETURNS: Object containing the following fields:
+  // column - the name of the column to inspect.
+  
     var dtr = dt(a); // date to request
     var dtr2 = dt(b); // second date to request
 
     // TODO: implement sensorType
 
-    var let = letter ? letter : '0A';
-
     // query = 'SELECT ESGgirder18, SampleIndex, Miliseconds, Time FROM SPBRTData_0A LIMIT 1000';
-    var queryHead = 'SELECT ESGgirder' + sensorNumber + ', SampleIndex, Time FROM SPBRTData_' + let + ' WHERE Time BETWEEN';
+    // The table names are formatted as follows:
+    // 
+    // NOTE: In some of the tables the following things:
+    // Gxx is a girder (make it with the sensorNumber parameter
+
+
+    var section = letter;
+
+    var tableName;
+
+    if (section === null) {
+      console.log("DETERMING THE SECTION AUTOMATICALLY");
+      section = determineSection(a, sensorNumber);
+
+      // The more recent ones are combined tables in the sections.
+      // What table should we pull from
+      tableName = determineTableName(a, sensorNumber);
+    } else {
+      // Older ones follow a known pattern.
+      tableName = "SPBRTData_" + letter;
+    }
+
+
+    var columnName = determineColumnName(a, sensorNumber);
+
+    console.log("Selecting column " + columnName + " from table " + tableName);
+
+
+    // TODO there is probably some much different formatting needed here.
+    // This only works when Time is a character (I would think)
+    var queryHead = 'SELECT ' + columnName + ', SampleIndex, Time FROM ' + tableName + ' WHERE Time BETWEEN';
     var query1 = ' "' + dtr.getFullYear() +
                '-' + pad(dtr.getMonth() + 1) +
                '-' + pad(dtr.getDate()) +
@@ -128,15 +169,113 @@ makeQuery = function(a, b, letter, sensorNumber, sensorType) {
                ':' + pad(dtr2.getSeconds() + 1) + '"';
     var queryTail = '';
 
+    // table is actually the database name (not the table name)
+    // The table name is expressed above
     var table = "SPB_SHM_" + dtr.getFullYear() + "MM" + pad(dtr.getMonth() + 1);
 
     return {
         query: queryHead + query1 + queryMid + query2 + queryTail,
         table: table,
+        column: columnName,
         sensorNumber: sensorNumber,
         sensorType: sensorType,
     };
 }
+
+
+
+
+var determineSection = function(sensorNumber) {
+  // RETURNS: the section identifier for the section.
+  // An empty string is returned if there are no matches
+  // for the girder number
+
+  // These are girder numbers, not taking into 
+  // account the straps or the dummies.
+  var AA_NUMBER_START = 25;
+  var AA_NUMBER_END = 48;
+  var CC_NUMBER_START = 9;
+  var CC_NUMBER_END = 24;
+  var DD_NUBER_START = 1;
+  var DD_NUMBER_END = 8;
+  if (sensorNumber >= AA_NUMBER_START && sensorNumber <= AA_NUMBER_END) {
+    return "AA";
+  } 
+
+  if (sensorNumber >= CC_NUMBER_START && sensorNumber && CC_NUMBER_END) {
+    return "CC";
+  }
+
+  if (sensorNumber >= DD_NUMBER_START && sensorNumber && DD_NUMBER_END) {
+    return "DD";
+  }
+
+  return "";
+
+};
+
+
+var determineColumnName = function(ms, sensorNumber) {
+  // Map the column name according to the date that is attempting
+  // RETURNS: the formatted string according to the sensorNumber
+  // and that matches the database for the Date corresponding 
+  // to ms parameter.
+  
+  var d = new Date(ms);   // Determine the date of the event now.
+  var year = d.getFullYear();
+
+  if (year >= 2014) {
+    // Depending on the month depends on the rule for formatting
+    return "G" + sensorNumber;
+  } else if (year == 2013) {
+    // October (month 10) was the last month that things were like this.
+    // The Date.getMonth() function returns 0-11 for the month number though.
+    if (d.getMonth() <= 9) {
+      return "ESGgirder" + sensorNumber;
+    } else {
+      return "G" + sensorNumber;
+    }
+  } else {
+    // Fall back to a default here (at least there is something to select then)
+    return "ESGgirder" + sensorNumber;
+  }
+};
+
+
+var determineTableName = function (ms, sensorNumber) {
+  // Parses the date and determines the correct database and 
+  // the connection infromation.
+  // RETURNS: table name for years 2014-
+  var d = new Date(ms);
+  //if (d.get^
+
+
+  // The section is common in many of the values
+  var section = determineSection(sensorNumber);
+
+
+  // For years starting in 11/2013 (which is 10 in JavaScript month index),
+  // The table name is SPBData_Raw_AA, etc
+  // For the years starting from 2012 to 2013, the years are 
+  // SPBRTData_Raw_AA, etc
+  
+
+  var year = d.getFullYear();
+
+  if (year >= 2014) {
+    return "SPBData_Raw_" + section;
+  } else if (year == 2013) {
+    if (d.getMonth() <= 9) {
+      return "SPBRTData_Raw_" + section;
+    } else {
+      return "SPBData_Raw_" + section;
+    }
+  } else if (year == 2012) {
+    // NOTE: this is actually a whole collection of tables that we need to implement properly.
+    return "SPBRTData_Raw_" + section;
+  } 
+};
+
 // PRIVATE FUNCTION }}}
 
 // {{{ PUBLIC METHODS
@@ -150,6 +289,7 @@ dateStringToMilliseconds = function (dateStr) {
   return theDate.getTime();
 }
 
+// Translate the function inputs/outputs here.
 samplesToMilliseconds = function (sampleIndex) {
   var samplesPerSecond = 200;
   var msPerSample = 1000/samplesPerSecond;
@@ -161,15 +301,59 @@ dateAndSampleIndexStringToMilliseconds = function (dateStr, sampleIndex) {
   return dateStringToMilliseconds(dateStr) + samplesToMilliseconds(sampleIndex);
 }
 
+
+
+// TODO: consider changing the ms0/ms1 parameters - that would likely yield much better results
+// for doing the selections.
 getDataFromDataBaseInRange = function (ms0, ms1, sensorNumber, sensorType, callback) {
+
+    console.log("getDataFromDataBaseInRange");
+    console.log(arguments);
+
+    // NOTE: These table assignments are wrong, we must make sure that the year appropriate one
+    // is used. The year appropriate one is the following:
     // TODO: if ms0 and ms=1 span months, query one for each month
     //       (will only ever be two months, otherwise it would
     //       take forever)
-    var vals = ['1A','1B','1C','1D','1E','1F','0A','0B','0C','0D','0E','0F','Raw_AA','Raw_CC','Raw_DD'];
+
+    // TODO we should avoid doing the queries like this (expensive to keep hitting the database
+    // again and again).
+    // In the 2011/2012 data, which has segmented (1A, etc) then we can use that
+    // otherwise, we can accelerate the process and attempt to make the following 
+    // things more efficiently done.
+
+
     var queries = [];
-    for (var i = 0, l = vals.length; i < l; i ++) {
-        queries.push(makeQuery(ms0, ms1, vals[i], sensorNumber, sensorType));
+    //var vals = ['1A','1B','1C','1D','1E','1F','0A','0B','0C','0D','0E','0F'];
+
+    var startDate = new Date(ms0);
+    if (startDate.getFullYear() == 2012) {
+
+      console.log("Need to use mutliple tables for the querying.");
+      // Then determine if we need to be querying which tables here
+     
+      if (startDate.getMonth() <= 3) {    // javascript's 0-indexed months
+        console.log("0 based table names");
+        var suffixes = ["0A", "0B", "0C", "0D", "0E", "0F"];
+        for (var i = 0; i < suffixes.length; i++) {
+          queries.push(makeQuery(ms0, ms1, suffixes[i], sensorNumber, sensorType));
+        }
+      } else if (startDate.getMonth() <= 6) {   // July was the last month for implementing that values
+        var suffixes = ["1A", "1B", "1C", "1D", "1E", "1F"];
+        for (var i = 0; i < suffixes.length; i++) {
+          queries.push(makeQuery(ms0, ms1, suffixes[i], sensorNumber, sensorType));
+        }
+      }
+    
+    } else {
+      // Modifying the function to just figure out the proper section on its own
+      // Another helpful one would just be all of the data in the tables 
+      // that are resulting from me attempting to be so awesome.
+      queries.push(makeQuery(ms0, ms1, null, sensorNumber, sensorType));
     }
+    
+
+    console.log(queries);
 
     var result = [];
 
@@ -191,11 +375,13 @@ getDataFromDataBaseInRange = function (ms0, ms1, sensorNumber, sensorType, callb
     series(queries.shift(), sendDatabaseQuery, callback);
 }
 
+// TODO These need to be moved to a credentails file
+// or another config file (it will just make it easier).
 sendDatabaseQuery = function(query, doWithResult) {
   if(debug) console.log("sending db query");
   var mysqlconnection = mysql.createConnection({
     host     : 'shm1.ee.umanitoba.ca',
-    user     : 'mattwoelk',
+    user     : 'umgrabam',
     password : fs.readFileSync(__dirname + '/ps').toString().trim(),
     database : query.table,
   });
@@ -203,10 +389,22 @@ sendDatabaseQuery = function(query, doWithResult) {
   mysqlconnection.query(query.query, function (err, rows, fields) {
     if (err) { if(debug){console.log("err: ", err);} doWithResult([]); return; }
     console.log(red+query.query, blue+rows.length+reset);
+    
+    // If there's no rows returned, then make a logging event out of it 
+    if (rows.length === 0) {
+      winston.info("QUERY " + query + " returned 0 rows");
+    } else {
+      winston.info("QUERY " + query + " returned " + rows.length + " rows");
+    }
+
     //console.log("ROWS: ", rows);
     var send_object = rows.map(function (d) {
         //console.log("asdf: " + query.sensorNumber);
-        return { val: d['ESGgirder' + query.sensorNumber],
+        console.log("rows.map");
+        console.log(d);
+
+        // TODO this won't actually work right at all
+        return { val: d[query.column],
                  ms: dateAndSampleIndexStringToMilliseconds(
                  d.Time + "",
                  d.SampleIndex)
