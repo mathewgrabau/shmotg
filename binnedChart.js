@@ -623,13 +623,18 @@ var binnedLineChart = function (data, dataRequester, sensorType, sensorNumber, o
 
         // Draw Time Context
         var timeContextSelection = timeContextContainer.selectAll(".sensor_time_context")
-        .data([getTimeContextString(xScale, showTimeContext)]);
+        .data([getTimeContextString(xScale, showTimeContext)])
+		;
         var titleContainer = timeContextContainer.selectAll(".sensor_title")
         .data([capitalize(sensorType) + " " + sensorNumber]);
 
         // enter
         timeContextSelection.enter().append("text")
-        .attr("class", "sensor_time_context");
+        .attr("class", "sensor_time_context")
+        .on("click", function(d) {
+          console.log(arguments);
+          console.log("A click has happened");
+        });
         titleContainer.enter().append("text")
         .attr("class", "sensor_title");
 
@@ -945,7 +950,7 @@ var binnedLineChart = function (data, dataRequester, sensorType, sensorNumber, o
                 waitingForServer = true;
                 if (dataRequester !== undefined && !dataRequester(req)) {
                     // if it's too soon, or it failed
-
+                    console.log("too soon or it failed");
                     waitingForServer = false;
                 }
             }
@@ -1043,6 +1048,7 @@ var binnedLineChart = function (data, dataRequester, sensorType, sensorNumber, o
     // TODO: make this independent of the actual HTML. Do it through bridgecharts.js instead
     my.setSelectedLines = function () {
         var a = [].map.call (document.querySelectorAll ("#render-lines input:checked"), getValue);
+        console.log(a);
         my.whichLinesToRender(a);
 
         var b = document.querySelector("#render-method input:checked").value;
@@ -1144,7 +1150,7 @@ var binnedLineChart = function (data, dataRequester, sensorType, sensorNumber, o
         }
 
         if (filteredDatas.length === 0) {
-            //console.log("NO DATA");
+            console.log("NO DATA");
         } else if (level === 0) {
             binData.addRawData(filteredDatas);
         } else {

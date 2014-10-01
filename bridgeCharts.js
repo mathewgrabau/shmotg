@@ -226,6 +226,11 @@ var redraw = function () {
             .style("opacity", 0.15)
             .style("fill", "#000");
 
+    // Add an event handler (trying to detect the problem with who's getting the clicking events here)
+    //zoomSVG.on('click', function(d) {
+     // console.log('zoomSVG click!');
+    //});
+
     //{{{ DRAW EDIT ELEMENTS
     var xsize = 70;
     var xspace = 20;
@@ -546,10 +551,14 @@ function getScaleValue(scal) {
 
 //{{{ SERVER COMMUNICATIONS
 
-var socket = io.connect('130.179.231.28:8080/');
+// The socket is being bound back here.
+//var socket = io.connect('130.179.231.28:8080/');
+var socket = io.connect('misc.mathewgrabau.ca:8888/');
 var firstTime = true;
 
+// socket.io is real-time, bi-directional communication.
 socket.on('news', function (data) {
+		console.log("socket.news");
     if (!firstTime) {
         // only do this once, so that plots don't get overlapped whenever the server restarts.
         return;
