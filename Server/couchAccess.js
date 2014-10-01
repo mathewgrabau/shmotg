@@ -1,6 +1,28 @@
+// Provides an interface to couch database server.
 var cradle = require('cradle')
+
 var db = new(cradle.Connection)().database('bridge_test2');
 var debug = false;
+
+
+// {{{ MAINTENANCE FUNCTIONS 
+
+// Adding the check to ensure that things really do exist.
+db.exists(function (err, exists) {
+	if (err) {
+		console.log(err);
+
+	} else {
+
+		if (!exists) {
+			console.log("COUCH DATABASE NOT FOUND - CREATEING");
+			db.create();
+		}
+	}
+});
+
+// MAINTENANCE FUNCTIONS }}}
+
 
 // TODO TODO TODO: make a function which merges data instead of just overwriting it
 //                 and use it instead!
@@ -136,3 +158,5 @@ checkIfExists = function (sensorType, sensorNumber, type, level, ms_start, callb
         callback(res.statusCode === 200);
     });
 }
+
+/* vim: set foldmethod=marker */
