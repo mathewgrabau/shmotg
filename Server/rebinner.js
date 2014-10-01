@@ -1,7 +1,7 @@
 // This goes through the couchdb database
 // and rebins data as requested. (See USAGE);
 
-var debug = false;
+var debug = true;
 
 ////////////////////////////////////////////////
 // Rebin at level 13 to best results.         //

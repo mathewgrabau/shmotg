@@ -6,6 +6,11 @@ require("../binnedData.js");
 require("./database.js");
 require("./couchAccess.js");
 var spawn = require('child_process').spawn;
+var winston = require('winston');
+
+// Generate some default logging information
+winston.add(winston.transports.Console);
+
 // SETUP }}}
 
 // {{{ COMMAND LINE INPUT
@@ -59,11 +64,11 @@ function callScraper (dat, callback) {
     scr.stdout.on('data', function (data) {
         var str = data.toString()
         var lines = str.split(/(\r?\n)/g);
-        console.log(lines.join("").replace(/\n/g, ''));
+				winston.info(lines.join("").replace(/n/g, ''));
     });
 
     scr.on('close', function (code) {
-        console.log('metarebinner - process exit code ' + code);
+				winston.info('metarebinner - process exit code ' + code);
         callback();
     });
 }

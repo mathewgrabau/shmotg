@@ -1,9 +1,17 @@
+//
+// 
+
 // {{{ SETUP
 var fs = require('fs');
 require("../binnedData.js");
 require("./database.js");
 require("./couchAccess.js");
 _ = require("underscore");
+var winston = require("winston");
+
+require('winston-loggly');
+
+require("loggly-conf.js");
 
 red = '\033[31m';
 yellow = '\033[33m';
@@ -21,12 +29,23 @@ function dt (num) {
 // {{{ GLOBAL VARIABLES
 var READ_FROM_COUCHDB = true;
 var READ_FROM_MYSQL = true;
+// NOTE: modified from the original (bound Apache to the local).
+var LISTEN_PORT = 8888;
+
 // GLOBAL VARIABLES}}}
 
 // {{{ LISTEN FOR CLIENTS
-var io = require('socket.io').listen(8080); //(app) for html
-io.configure(function () { io.set('log level', 2); });
+var io = require('socket.io').listen(LISTEN_PORT); //(app) for html
+// The io.configure is now replaced by the DEBUG environment variable.
+// apparently the log-level option is completly gone now
+//io.configure(function () { io.set('log level', 2); });
 // LISTEN FOR CLIENTS }}}
+
+winston.info("Binning server listening on port " + LISTEN_PORT);
+
+
+
+
 
 // {{{ HELPER FUNCTIONS
 function dateStringToMilliseconds (dateStr) {
@@ -49,11 +68,14 @@ io.sockets.on('connection', function (socket) {
     socket.emit('news', send_to_user);
 
     socket.on('ack', function (data) {
-        console.log("client: " + data);
+        winston.log("client: " + data);
     });
     // CONNECT WITH CLIENT }}}
 
     socket.on('req', function (sendReq) {
+      // Put some logging information down there.
+      winston.info("Received request from client: " + sendReq);
+
         //{{{ PARSE REQUEST
         var received = JSON.parse(sendReq);
         var req = received.req;
@@ -61,6 +83,8 @@ io.sockets.on('connection', function (socket) {
 
         var range = [parseInt(req.ms_start), parseInt(req.ms_end)];
         //}}} PARSE REQUEST
+        //
+
 
         // {{{ SEND TO CLIENT
         var sendToClient = function (dat, lvl) {
@@ -110,12 +134,17 @@ io.sockets.on('connection', function (socket) {
 
         // See if we need to get data from the database (because the level is lower than we have pre-binned)
         if (READ_FROM_MYSQL && req.bin_level < 6) { // TODO: magic
+
+          winston.info("** LOW LEVEL: GET FROM DATABASE ** lvl: " + req.bin_level);
+
             // {{{ GET AND SEND REQUEST
             console.log("** LOW LEVEL: GET FROM DATABASE ** lvl:", req.bin_level);
                                         //            just make it readable and throw it on through
             var tmpData = binnedData(); // TODO TODO: this doesn't need to be a full-blown object...
 
             getDataFromDataBaseInRange(range[0], range[1], req.sensorNumber, req.sensorType, function (queryResult) {
+  
+              //
                 // Bin the new data
                 console.log("- data received...");
                 try {
@@ -194,5 +223,5 @@ io.sockets.on('connection', function (socket) {
     });
 });
 
-console.log('Server is running on port 8080');
+console.log('Server is running on port ' + LISTEN_PORT);
 /* vim: set foldmethod=marker: */

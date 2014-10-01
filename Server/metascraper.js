@@ -4,6 +4,17 @@ require("./database.js");
 require("./couchAccess.js");
 var spawn = require('child_process').spawn;
 
+// Use a nicer console
+console = require('better-console');
+
+var winston = require('winston');
+
+winston.remove(winston.transports.Console);
+winston.add(winston.transports.Console, {
+	colorize: true,
+	timestamp: true
+});
+
 function daysInMonth(yr, mo) {
     var dtr = new Date(yr, mo, 0);
     return dtr.getDate();
@@ -56,7 +67,7 @@ function series(item, func) {
             return series(walkings.shift(), func);
         });
     } else {
-        console.log("metascraper - Rebinning now!");
+				winston.info("metascraper - Rebinning now!");
 
         // Rebin this with the two months around it:
         callMetaRebinner(
@@ -91,18 +102,24 @@ for (var y = start_year; y <= end_year; y++) {
 }
 
 function callScraper (dat, callback) {
-    console.log('metascraper - starting scraper', dat[0], dat[1], dat[2], dat[3], dat[4], dat[5], dat[6], dat[7], dat[8]);
+		// TODO consider the logging level there (it should/could probably be much higher)
+    winston.info('metascraper - starting scraper', dat[0], dat[1], dat[2], dat[3], dat[4], dat[5], dat[6], dat[7], dat[8]);
     var scr = spawn('node',  ['scraper', dat[0], dat[1], dat[2], dat[3], dat[4], dat[5], dat[6], dat[7], dat[8]]);
 
     scr.stdout.setEncoding('utf8');
     scr.stdout.on('data', function (data) {
         var str = data.toString()
         var lines = str.split(/(\r?\n)/g);
-        console.log(lines.join("").replace(/\n/g, ''));
+				winston.info('data');
+				winston.info(lines.join("").replace(/\n/g, " | "));
     });
 
     scr.on('close', function (code) {
-        console.log('metascraper - process exit code ' + code);
+				if (code) {
+					winston.error('metascraper - process exit code ' + code);
+				} else {
+					winston.info('metascraper - process exit code ' + code);
+				}
         callback();
     });
 }
