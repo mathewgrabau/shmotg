@@ -113,7 +113,11 @@ function combineWithoutDuplicates(arr1, arr2) {
 }
 
 // NOTE: The sensor type is either strap or girder.
+// Depending on the sensor type, using an either G/S (or ESGgirder
+// or ESGstrap)
 makeQuery = function(a, b, letter, sensorNumber, sensorType) {
+  // @param   a   The milliseconds requested for the query
+  // @param   b   The milliseconds corresponding to the end time.
   // RETURNS: Object containing the following fields:
   // column - the name of the column to inspect.
   
@@ -150,31 +154,60 @@ makeQuery = function(a, b, letter, sensorNumber, sensorType) {
 
     console.log("Selecting column " + columnName + " from table " + tableName);
 
+    // NOTE: This column is not quite accurate, as the Time (and/or Date clause) must 
+    // be formatted porperly.
+
+    // The date/time inputs are not formed to input properly.
+    // When dealing with 2014 data, etc there are two fields to deal with:
+    // There is the requirement to update the values of the interfacing 
+
+
+    var whereClause = generateWhereClause(a, b);
+
+    console.log("whereClause = " + whereClause);
+    
+    if (whereClause === null) {
+      console.log("whereClause null, dynamic clause not available");
+    } else {
+      console.log("Using a dynamically formed WHERE clause!");
+    }
+    
+    var query = "";
+
 
     // TODO there is probably some much different formatting needed here.
     // This only works when Time is a character (I would think)
-    var queryHead = 'SELECT ' + columnName + ', SampleIndex, Time FROM ' + tableName + ' WHERE Time BETWEEN';
-    var query1 = ' "' + dtr.getFullYear() +
-               '-' + pad(dtr.getMonth() + 1) +
-               '-' + pad(dtr.getDate()) +
-               ' ' + pad(dtr.getHours()) +
-               ':' + pad(dtr.getMinutes()) +
-               ':' + pad(dtr.getSeconds()) + '"';
-    var queryMid = ' AND ';
-    var query2 = '"' + dtr2.getFullYear() +
-               '-' + pad(dtr2.getMonth() + 1) +
-               '-' + pad(dtr2.getDate()) +
-               ' ' + pad(dtr2.getHours()) +
-               ':' + pad(dtr2.getMinutes()) +
-               ':' + pad(dtr2.getSeconds() + 1) + '"';
-    var queryTail = '';
+    
+    if (whereClause != null) {
+      // TODO we need to do some adapting for the Date/Time to be able to turn these into a 
+      // date and time again.
+      query = "SELECT " + columnName + ', SampleIndex, Time, Date FROM ' + tableName + ' ' + whereClause;
+    } else {
+      var queryHead = 'SELECT ' + columnName + ', SampleIndex, Time FROM ' + tableName + ' WHERE Time BETWEEN';
+      var query1 = ' "' + dtr.getFullYear() +
+                 '-' + pad(dtr.getMonth() + 1) +
+                 '-' + pad(dtr.getDate()) +
+                 ' ' + pad(dtr.getHours()) +
+                 ':' + pad(dtr.getMinutes()) +
+                 ':' + pad(dtr.getSeconds()) + '"';
+      var queryMid = ' AND ';
+      var query2 = '"' + dtr2.getFullYear() +
+                 '-' + pad(dtr2.getMonth() + 1) +
+                 '-' + pad(dtr2.getDate()) +
+                 ' ' + pad(dtr2.getHours()) +
+                 ':' + pad(dtr2.getMinutes()) +
+                 ':' + pad(dtr2.getSeconds() + 1) + '"';
+      var queryTail = '';
+      
+      query = queryHead + query1 + queryMid + query2 + queryTail;
+    }
 
     // table is actually the database name (not the table name)
     // The table name is expressed above
     var table = "SPB_SHM_" + dtr.getFullYear() + "MM" + pad(dtr.getMonth() + 1);
-
+        
     return {
-        query: queryHead + query1 + queryMid + query2 + queryTail,
+        query: query,
         table: table,
         column: columnName,
         sensorNumber: sensorNumber,
@@ -196,7 +229,7 @@ var determineSection = function(sensorNumber) {
   var AA_NUMBER_END = 48;
   var CC_NUMBER_START = 9;
   var CC_NUMBER_END = 24;
-  var DD_NUBER_START = 1;
+  var DD_NUMBER_START = 1;
   var DD_NUMBER_END = 8;
   if (sensorNumber >= AA_NUMBER_START && sensorNumber <= AA_NUMBER_END) {
     return "AA";
@@ -210,6 +243,7 @@ var determineSection = function(sensorNumber) {
     return "DD";
   }
 
+  // Default return an empty string.
   return "";
 
 };
@@ -276,6 +310,62 @@ var determineTableName = function (ms, sensorNumber) {
   } 
 };
 
+var generateWhereClause = function (msStart, msEnd) {
+  // Parameter validation
+  if (msStart > msEnd) {
+    var temp = msEnd;
+    msEnd = msStart;
+    msStart = temp;
+  }
+
+  var start = new Date(msStart);
+  var end = new Date(msEnd);
+
+  // NOTE: this does not allow them to overlap (would need to join two different dates)
+
+  var clause = null;
+
+  if (start.getFullYear() == 2012) {
+    // This is just the formatted results
+  } else if (start.getFullYear() == 2013) {
+      
+  } else if (start.getFullYear() == 2014) {
+    // Date is the integer
+    // Time is a float (number of milliseconds I think) 
+
+
+    var numeralDateStart;
+    var numeralDateEnd;
+
+
+    var INT_DATE_YEAR_SHIFT = 10000;
+    var INT_DATE_MONTH_SHIFT = 100;
+    console.log(start);
+    console.log(end);
+    numeralDateStart = start.getFullYear() * INT_DATE_YEAR_SHIFT + (start.getMonth() + 1) * INT_DATE_MONTH_SHIFT + start.getDate();
+    numeralDateEnd = end.getFullYear() * INT_DATE_YEAR_SHIFT + (end.getMonth() + 1) * INT_DATE_MONTH_SHIFT + end.getDate();
+
+    // TODO review the use of the BETWEEN clause with the Time (it might be having wrong consequences, and it
+    // may be better to just treat the date/time arguments as one).
+    clause = "WHERE (Date BETWEEN " + numeralDateStart + " AND " + numeralDateEnd + ") AND (Time BETWEEN ";
+
+    // TODO this needs the Time clause next. The time clause I think is just the number of seconds that have passed.
+
+
+    // To convert the seconds:
+    // Hours * 3600 + Minutes * 60 + Seconds + milliseconds / 1000
+
+
+    // NOTE: The floating conversion is okay (the database is expecting that anyways)
+    var numeralTimeStart = start.getHours() * 3600 + start.getMinutes() * 60 + start.getSeconds() + start.getMilliseconds() / 1000.0;
+    var numeralTimeEnd = end.getHours() * 3600 + end.getMinutes() * 60 + end.getSeconds() + end.getMilliseconds() / 1000.0;
+
+    clause += numeralTimeStart + " AND " + numeralTimeEnd + ");";
+  }
+
+  return clause;
+};
+
 // PRIVATE FUNCTION }}}
 
 // {{{ PUBLIC METHODS
@@ -286,10 +376,13 @@ dateStringToMilliseconds = function (dateStr) {
     theDate = d3.time.format("%Y-%m-%d %H:%M:%S")
       .parse(dateStr.substring(0, 19));
   }
+  // NOTE: this function should not be called unless we know there is a DATETIME type is
+  // applicable for the column - does not apply in all cases.
   return theDate.getTime();
 }
 
 // Translate the function inputs/outputs here.
+// NOTE: what about the data that was actually on the 100 samplesPerSecond!?
 samplesToMilliseconds = function (sampleIndex) {
   var samplesPerSecond = 200;
   var msPerSample = 1000/samplesPerSecond;
@@ -300,6 +393,48 @@ samplesToMilliseconds = function (sampleIndex) {
 dateAndSampleIndexStringToMilliseconds = function (dateStr, sampleIndex) {
   return dateStringToMilliseconds(dateStr) + samplesToMilliseconds(sampleIndex);
 }
+
+
+// Parsing Time, Date, SampleIndex column
+millisecondsFromParts = function(row) {
+  
+  // These functions aid in the implementation by breaking some of this stuff up.
+  
+  var extractYear = function(dateColumn) { 
+    var YEAR_SHIFT = 10000;
+    return dateColumn / YEAR_SHIFT;
+  };
+  
+  var extractMonth = function(dateColumn) {
+    var MONTH_SHIFT = 100;
+    var temp = dateColumn / MONTH_SHIFT;
+    temp = temp % MONTH_SHIFT;
+    return temp;
+  };
+  
+  var extractDate = function(dateColumn) {
+    return dateColumn % 100;
+  };
+  
+ 
+  var year = extractYear(row.Date);
+  var month = extractMonth(row.Date);
+  var date = extractDate(row.Date);
+  
+  // Compute the number of milliseconds 
+  // An example value is 21005.3 (21005 seconds + 300 milliseconds)
+  //var milliseconds = Math.floor(row.Time)  + row.SampleIndex
+  
+  var milliseconds = row.SampleIndex * (1000 / 200);
+  var seconds = Math.floor(row.Time);
+  var hours = seconds / 3600;
+  var minutes = (hours - Math.floor(hours)) * 60;
+
+  var tempDate = new Date(year, month - 1, date, hours, minutes, seconds, milliseconds);
+
+  return tempDate.getTime();
+  
+};
 
 
 
@@ -325,6 +460,7 @@ getDataFromDataBaseInRange = function (ms0, ms1, sensorNumber, sensorType, callb
 
     var queries = [];
     //var vals = ['1A','1B','1C','1D','1E','1F','0A','0B','0C','0D','0E','0F'];
+
 
     var startDate = new Date(ms0);
     if (startDate.getFullYear() == 2012) {
@@ -392,7 +528,7 @@ sendDatabaseQuery = function(query, doWithResult) {
     
     // If there's no rows returned, then make a logging event out of it 
     if (rows.length === 0) {
-      winston.info("QUERY " + query + " returned 0 rows");
+      winston.warn("QUERY " + query + " returned 0 rows");
     } else {
       winston.info("QUERY " + query + " returned " + rows.length + " rows");
     }
@@ -402,12 +538,21 @@ sendDatabaseQuery = function(query, doWithResult) {
         //console.log("asdf: " + query.sensorNumber);
         console.log("rows.map");
         console.log(d);
-
+        
+        var ms = 0;
+        
+        if (d.Date !== undefined && d.Time !== undefined) {
+          console.log("Need to process the date/float combo for the dates.");
+          ms = millisecondsFromParts(d);
+          
+        } else {
+          console.log("Process the standard ms conversion (the older one)");
+          ms = dateAndSampleIndexStringToMilliseconds(d.Time + "", d.SampleIndex);
+        }
+        
         // TODO this won't actually work right at all
         return { val: d[query.column],
-                 ms: dateAndSampleIndexStringToMilliseconds(
-                 d.Time + "",
-                 d.SampleIndex)
+                 ms: ms
                };
     });
 
