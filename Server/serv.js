@@ -88,6 +88,49 @@ io.sockets.on('connection', function (socket) {
         var req = received.req;
         var id = received.id;
 
+
+        // TODO what is the id value used for??
+
+        if (received.sensorType !== undefined && received.sensorType == "bwimEvents") {
+          winston.info("Processing event retrieval for " + received.date);
+
+
+          // Default is the start of the day (midnight)
+          if (received.startTime === undefined) {
+            received.startTime = 0;
+          } else {
+            received.startTime = parseInt(received.startTime);
+          }
+
+          // Default is the end of the day now.
+          if (received.endTime === undefined) {
+            received.endTime = 240000;
+          } else {
+            received.endTime = parseInt(recieved.endTime);
+          }
+
+          getBwimEvents(received.date, received.startTime, received.endTime, function (queryResult) {
+            
+            console.log("time to send to the client!");
+
+            winston.log('returning results for request' + id);
+            console.log("returning results for request" + id);
+
+
+            var results = {
+              id: id, 
+              events: queryResult
+            };
+
+
+            // TODO figure out why there is so much trouble here.
+            // TODO perform some checking on the data to ensure that the transformation was done properly.
+            socket.emit('req_data', JSON.stringify(results));
+          });
+          // We are done here for the information
+          return;
+        }
+
         var range = [parseInt(req.ms_start), parseInt(req.ms_end)];
         //}}} PARSE REQUEST
         //
@@ -138,6 +181,8 @@ io.sockets.on('connection', function (socket) {
             console.log("- sent to client");
         };
         // SEND TO CLIENT }}}
+
+        // If we are using the BWIM event gathering interface, then we are definitely getting the values as returned by that.
 
         // See if we need to get data from the database (because the level is lower than we have pre-binned)
         if (READ_FROM_MYSQL && req.bin_level < 6) { // TODO: magic

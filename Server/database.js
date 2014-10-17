@@ -568,5 +568,94 @@ pad = function(integ) {
   if (i.length === 1) { i = "0" + i; } // pad with a zero if necessary
   return i;
 }
+
+/**
+ *  A function to extract the BWIM evert data from the applicable table.
+ */
+getBwimEvents = function(date, startTime, endTime, callback) {
+
+  // The format for the date argument (matches the database)
+  // is 20140901 (
+  // The columns relevant are StartTime_DD, EndTime_DD
+  // StartTime_CC, EndTime_CC,
+  // StartTime_AA, EndTime_AA
+  // Those are formatted with a time argument, so that's important.
+  var year = Math.floor(date / 10000);
+  // Take off the last two, then mod it to get the moth
+  var month = Math.floor(date / 100) % 100;
+
+
+  // So something in the column like 801000517212
+  // Is (from 2014 - not encoded in the data)
+  // 0801 (month/date)
+  // Leaving 000517212
+  // Which is 00:05:17.212 (HH:MM:SS.fff)
+  // Therefore, if the time argument is specified for second accuracy right now, 
+ 
+  // That should about do it.
+
+  console.log(year);
+
+  console.log(month);
+  console.log(pad(month));
+  
+  var databaseName = "SPB_SHM_" + year + "MM" + pad(month);
+
+  var day = date % 100;
+
+  var monthShift = 100000000000;
+  var dayShift =   1000000000;
+
+  var timeShift = 1000; // shift past the milliseconds
+
+  // Shift each of them up by 1000 to account for the milliseconds argument.
+  var startTimeArgument = (startTime * timeShift) + month * monthShift + day * dayShift;
+  var endTimeArgument = (endTime * timeShift) + month * monthShift + day * dayShift;
+
+  // Just debugging outputs, remove this.
+  console.log("startTimeArgument = " + startTimeArgument);
+  console.log("endTimeArgument = " + endTimeArgument);
+
+  var mysqlconnection = mysql.createConnection({
+    host : 'shm1.ee.umanitoba.ca',
+    user: 'umgrabam',
+    password: fs.readFileSync(__dirname + '/ps').toString().trim(),
+      database: databaseName
+  });
+
+//  mysqlconnection.query("SELECT * FROM SPBData_Truck WHERE Date = " + date + " AND Time >= " + startTime + " AND Time <= " + endTime, function(err, rows, fields) {
+  mysqlconnection.query("SELECT * FROM SPBData_Truck_BWIM WHERE (StartTime_DD >= " + startTimeArgument + " AND EndTime_DD <= " + endTimeArgument + ")"
+      + " OR (StartTime_CC >= " + startTimeArgument + " AND EndTime_CC <= " + endTimeArgument + ")"
+      + " OR (StartTime_AA >= " + startTimeArgument + " AND EndTime_AA <= " + endTimeArgument + ")", function (err, rows, fields) {
+
+    if (err) {
+      winston.error("Query error " + err);
+      callback([]);
+      return;
+    }
+
+    if (rows.length == 0) {
+      winston.warn("QUERY returned 0 rows");
+    } else {
+      winston.info("QUERY returned " + rows.length + " rows");
+    }
+
+    var send_object = rows.map(function(d) {
+      console.log("rows.map");
+      console.log(d);
+
+      // Then start determining the event times/dates correspondingly.
+      return d;
+      
+    });
+
+    // The completion routine can be called now to send the data back to the client
+    callback(send_object);
+  });
+
+
+
+};
+
 // PUBLIC METHODS }}}
 /* vim: set foldmethod=marker: */
