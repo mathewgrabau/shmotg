@@ -1,0 +1,168 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scaleable=no" />
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="applie-mobile-web-app-capable" content="yes" />
+  <meta name="description" content="bwim" />
+
+  <title>Manitoba BWIM Event Viewer</title>
+  <link href="http://cdn.syncfusion.com/js/mobile/ej.mobile.all-latest.min.css" rel="stylesheet" />
+  <script type="text/javascript" src="socket.io-1.1.0.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="http://borismoore.github.io/jsrender/jsrender.min.js"></script>
+  <script type="text/javascript" src="http://cdn.syncfusion.com/js/mobile/ej.mobile.all-latest.min.js"></script>
+
+  </head>
+  <body>
+
+  <!-- AppView declaration -->
+  <div data-role="appv$iew">Mobile JS Application
+    <div><select id="year">
+        <option value="2014">2014</option>
+      </select>
+      <select id="month">
+        <option value="6">06 (JUN)</option>
+        <option value="7">07 (JUL)</option>
+        <option value="8">08 (AUG)</option>
+        <option selected value="9">09 (SEP)</option>
+      </select>
+    </div>
+    <div id="mobgrid"></div>
+  </div>
+
+
+
+    <script type="text/javascript">
+    $(function() {
+
+
+        // This one won't actually have the values that are required so much anymore
+
+        var socket = io.connect("misc.mathewgrabau.ca:8888/");
+        var firstTime = true;
+
+        // This is the one getting bound to my events of the data now.
+        var bridgeEvents = [];
+
+        var requestId = 0;
+
+        socket.on("news", function(data) {
+            if (!firstTime) {
+              return;
+            }
+
+            firstTime = false;
+
+            // Initialize the grid now, start getting the data better
+
+            var dataRequest = {
+              sensorType: "bwimEvents",
+              date: 20140901,
+              id: requestId
+            };
+
+            requestId++;
+
+            socket.emit("req", JSON.stringify(dataRequest));
+
+        });
+
+        $("#month").change(function() {
+
+            console.log($(this).val());
+
+            // TODO we need to get the values for the day in there as well.
+
+
+            var month = parseInt($(this).val());
+
+            // Then the parsing of the requested values must be sent out.
+            var d = parseInt($("#year").val()) * 10000 + parseInt($("#month").val()) * 100 + 01;
+
+            console.log(d);
+
+            var request = {
+              sensorType: "bwimEvents",
+              date: d,
+              id: requestId
+              };
+
+              requestId++;
+
+            socket.emit("req", JSON.stringify(request));
+            });
+
+        var dataManager= null;
+        var receivedData = [];
+
+        socket.on("req_data", function(data) {
+            var received = JSON.parse(data);
+
+            // TODO implement the requesting queue already, so in otherwords add ot the data manager.
+
+            // TODO we need to customize these implementations soon, allowing
+            if (dataManager == null) {
+
+              receivedData = received.events;
+              dataManager = ej.DataManager(receivedData);
+
+              // There are too many items (it only seems to show 14 of them)
+              $("#mobgrid").ejmGrid({
+                  dataSource: dataManager,
+                  allowColumnSelector: true,
+                  allowPaging: true,
+                  allowScrolling: true,
+                  scrollSettings: {enableColumnScrolling: true}, 
+
+                  rowSelected: gridRowSelected,
+                  columns: [
+                    { field: "StartTime_DD", width: 200, headerText: "S/DD"},
+                    { field: "EndTime_DD", width: 200 , headerText: "E/DD"},
+                    { field: "StartTime_CC", width: 200, headerText: "S/CC" },
+                    { field: "EndTime_CC", width: 200, headerText: "E/CC" },
+                    { field: "StartTime_AA", width: 200, headerText: "S/AA" },
+                    { field: "EndTime_AA", width: 200, headerText: "E/AA" }
+                    ]
+                    });
+            } else {
+
+              console.log(dataManager);
+
+
+              // Apparently this is the most efficient way to do this.
+              while (receivedData.length) {
+                receivedData.pop();
+              }
+
+
+              // NOTE: I may need a specific value to insert properly.
+              received.events.forEach(function(element, index) {
+                  dataManager.insert(element);
+                  });
+
+
+              var grid = $("#mobgrid").data("ejmGrid");
+              grid.refreshContent();
+
+            }
+      });
+            
+
+            //
+        function gridRowSelected(e) {
+          console.log(e);
+
+          // Then we need to make sure that things are working out well for the appication
+          // by closing/hiding the grid, and showing the rendering.
+          // We need to emit a socket request, that will get the values of the sectional data.
+
+        }
+
+
+    });
+        
+    </script>
+  </body>
+</html>
