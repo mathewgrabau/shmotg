@@ -657,5 +657,215 @@ getBwimEvents = function(date, startTime, endTime, callback) {
 
 };
 
+/**
+ *  getSectionDataFromDatabase
+ *
+ *  Perform the query across a specified section (args.section), must be 
+ *
+ *  args.start provides the starting time in the database formatted time
+ *  format.
+ *
+ *  args.end provides the ending time in the database formatted time format.
+ *
+ *  YYYYMMDDHHMMSSfff
+ */
+getSectionDataFromDatabase = function(args, callback) {
+
+  // The section listing is determined by the values there.
+
+  // TODO consider including the strap data as well.
+  // TODO could optimize by just listing the columns.
+  /* Determines which columns should be selected based on each section. */
+  var SECTION_COLUMNS = {
+    "aa": ["G25", "G26", "G27", "G28", "G29", "G30", "G31", "G32", "G33", "G34", "G35", "G36", "G37", "G38", "G39", "G40", "G41", "G42", "G43", "G44", "G45", "G46", "G47", "G48"],
+    "cc": ["G9", "G10", "G11", "G12", "G13", "G14", "G15", "G16", "G17", "G18", "G19", "G20", "G21", "G22", "G23", "G24"],
+    "dd": ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8"]
+  };
+
+  console.log("--- getSectionDataFromDatabase ---");
+  console.log(args);
+
+
+  var section = "";
+
+  if (args.section) {
+    section = args.section.toLowerCase();
+  }
+
+  console.log("section = " + section);
+
+
+  // Function to compile the listing fo the columns
+  var buildColumnList = function(section) {
+    var base = "Date, Time, SampleIndex";
+
+    SECTION_COLUMNS[section].forEach(function(value, index, array) {
+      base += "," + value;
+    }, SECTION_COLUMNS);
+
+    return base;
+  };
+
+  var startDate = parseInt(args.start);
+  var endDate = parseInt(args.end);
+
+  // The hybrid dates have a different format. 
+  var MILLISECONDS_SIZE = 1000;
+  var SECONDS_SHIFT = MILLISECONDS_SIZE;
+  var SECONDS_SIZE = 100;
+  var MINUTES_SHIFT = SECONDS_SHIFT * SECONDS_SIZE;
+  var MINUTES_SIZE = 100;
+  var HOURS_SHIFT = MINUTES_SHIFT * MINUTES_SIZE;
+  var HOURS_SIZE = 100;
+  var DAY_SHIFT = HOURS_SIZE * HOURS_SHIFT;
+  var DAY_SIZE = 100;
+  var MONTH_SHIFT = DAY_SHIFT * DAY_SIZE;
+  var MONTH_SIZE = 100;
+  var YEAR_SHIFT = MONTH_SIZE * MONTH_SHIFT;
+
+  console.log(startDate);
+  console.log(endDate);
+
+  var startYear = Math.floor(startDate / YEAR_SHIFT);
+  var endYear = Math.floor(endDate / YEAR_SHIFT);
+
+  if (startYear !== endYear) {
+    throw "startYear !== endYear, query not possible";
+  }
+
+  startMonth = Math.floor(startDate / MONTH_SHIFT) % MONTH_SIZE;
+  console.log("startMonth = " + startMonth);
+  endMonth = Math.floor(endDate / MONTH_SHIFT) % MONTH_SIZE;
+  console.log("endDate = " + endDate);
+
+  // TODO winston logging instead, and return a value to the client that would
+  // indicate to them that there is an error on the socket.
+  if (startMonth !== endMonth) {
+    throw "startMonth !== endMonth, query not possible";
+  }
+
+  var tableName = "SPBData_Raw_" + section.toUpperCase();
+  var databaseName = "SPB_SHM_" + startYear + "MM" + (startMonth < 10 ? "0" + startMonth : "" + startMonth);
+
+  var connection = mysql.createConnection({
+    host : 'shm1.ee.umanitoba.ca',
+    user: 'umgrabam',
+    password: fs.readFileSync(__dirname + '/ps').toString().trim(),
+      database: databaseName
+  });
+  // TODO we need to format the time reading as well.
+
+
+  var timeShift = 1000000000;
+  var startTime = startDate % DAY_SHIFT;
+  var endTime = endDate % DAY_SHIFT;
+  var startDate = Math.floor(startDate / DAY_SHIFT);
+  var endDate = Math.floor(endDate / DAY_SHIFT);
+
+  // Time determination 
+  var dateComponent = startDate % DAY_SHIFT;
+  console.log("dateComponent = " + dateComponent + ", startDate = " + startDate);
+  //var startTime = startDate - ((startDate % DAY_SHIFT) * DAY_SHIFT);
+  var startTime = parseInt(args.start) - startDate * DAY_SHIFT;
+  //var endTime = endDate - ((endDate % DAY_SHIFT) * DAY_SHIFT);
+  var endTime = parseInt(args.end) - endDate * DAY_SHIFT;
+
+  var millisecondsComponent = startTime % MILLISECONDS_SIZE;
+
+  millisecondsComponent = "" + millisecondsComponent;
+
+  while (millisecondsComponent.length < 3) {
+    millisecondsComponent = "0" + millisecondsComponent;
+  }
+
+  startTime = Math.floor(startTime / MILLISECONDS_SIZE) + "." + millisecondsComponent;
+
+  millisecondsComponent = endTime % MILLISECONDS_SIZE;
+  millisecondsComponent = "" + millisecondsComponent;
+
+  while (millisecondsComponent.length < 3) {
+    millisecondsComponent = "0" + millisecondsComponent;
+  }
+
+  endTime = Math.floor(endTime / MILLISECONDS_SIZE) + "." + millisecondsComponent;
+
+  console.log("startTime = " + startTime);
+  console.log("endTime = " + endTime);
+
+  var query = "SELECT " + buildColumnList(section) + " FROM " + tableName +
+    " WHERE Date >= " + startDate + " AND Date <= " + endDate + 
+    " AND Time >= " + startTime + " AND Time <= " + endTime + ";";
+
+  console.log(query);
+
+
+  connection.query(query, function(err, rows, fields) {
+    if (err) {
+      winston.error(err);
+      winston.error("err = " + err);
+      callback([]);
+      return;
+    }
+
+    // Then we are returning the values that are making me update the values
+    var send_object = rows.map(function(d) {
+      var ms = 0;
+
+      // TODO figure out the translations.
+      console.log(d);
+
+      // Then we need an object here that can easily translate for me and
+      // get the data out.
+
+      // TODO need to convert the value to the proper ms (assume that it's UTC?)
+
+      var sampleIndexMilliseconds = 5 * d.SampleIndex;
+
+      var DATE_DAY_SIZE = 100;
+      var DATE_MONTH_SHIFT = DATE_DAY_SIZE;
+      var DATE_MONTH_SIZE = 100;
+      var DATE_YEAR_SHIFT = DATE_MONTH_SHIFT * DATE_MONTH_SIZE;
+      var recordYear = Math.floor(d.Date / DATE_YEAR_SHIFT);
+      var recordMonth = Math.floor((d.Date % DATE_YEAR_SHIFT) / DATE_DAY_SIZE);
+      console.log(recordMonth);
+
+      var recordDay = d.Date % DATE_MONTH_SHIFT;
+      console.log(recordDay);
+
+
+      // Perform the time conversion now
+      var recordMilliseconds = Math.floor(d.Time * 1000) % 1000; 
+      recordMilliseconds += sampleIndexMilliseconds;
+
+      // The remaining Time component is in HHMMSS
+      var recordSeconds = Math.floor(d.Time) % 100;
+      var recordMinutes = Math.floor(Math.floor(d.Time) / 100) % 100;
+      var recordHours = Math.floor(Math.floor(d.Time) / 10000);
+
+      var date = new Date(recordYear, recordMonth - 1, recordDay, recordHours, recordMinutes, recordSeconds, recordMilliseconds);
+
+      console.log(date);
+
+      var returnData = {};
+      SECTION_COLUMNS[section].forEach(function(element, index, array) {
+        returnData[element] = d[element];
+      });
+
+      returnData.section = section;
+
+      console.log(returnData);
+
+      returnData.ms = date.getTime();
+
+      return returnData;  
+    });
+
+    // Process the resulting implementation
+    callback(section, send_object);
+  });
+
+  connection.end();
+};
+
 // PUBLIC METHODS }}}
 /* vim: set foldmethod=marker: */

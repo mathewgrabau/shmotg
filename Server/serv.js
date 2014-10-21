@@ -131,6 +131,67 @@ io.sockets.on('connection', function (socket) {
           return;
         }
 
+        if (received.sensorType !== undefined) {
+          // Then gather all of the data from the AA section of the bridge and query fro it.
+
+          received.sensorType = received.sensorType.toLowerCase();
+          switch (received.sensorType) {
+
+            case "aa":
+              break;
+            case "cc":
+              break;
+
+            case "eventdata":
+              // This is a specific query that allows us to get the starting/ending date range in the more recent years, based on a specific range that // is offered up by the development inforamtion.
+              
+
+              // Log in the reception of the request (TODO make this a tracing event though)
+              winston.log(received);
+
+              // Then we need to do the chain of queries here.
+              var sectionQueries = [];
+              sectionQueries.push({section: "AA", start: received.StartTime_AA, end: received.EndTime_AA});
+              sectionQueries.push({section: "CC", start: received.StartTime_CC, end: received.EndTime_CC});
+              sectionQueries.push({section: "DD", start: received.StartTime_DD, end: received.EndTime_DD});
+
+
+              // Then we need to start pursuing the queries, recovering the data in the range that is specified
+              
+
+              var result = {};
+
+              function series(item, func, callback) {
+                if (item) {
+                  // Call the function on them.
+                  // The fuction must be indicated into the range there.
+                  func(item, function(section, data) {
+                    // TODO figure out what processing there might also be requried.
+                    result[section] = data;
+
+                    console.log("section = " + section + ", data.length = " + data.length);
+                    // Continue the chain of calling into the next function now.
+                    return series(sectionQueries.shift(), func, callback);
+                  })
+                 } else {
+                   // This calls the callback and completes the chain of queries that were outputted.
+                   return callback(result);
+                 }
+              }
+
+              // Iterate over the sections and process them accordingly.
+              series(sectionQueries.shift(), getSectionDataFromDatabase, function(data) {
+                winston.info("Returning query result to the client for request id " + id); 
+                result.id = id;
+                socket.emit("section_data", JSON.stringify(result));
+              });
+              
+
+              // No further processing to be done on this paricular request.
+              return;
+          }
+        }
+
         var range = [parseInt(req.ms_start), parseInt(req.ms_end)];
         //}}} PARSE REQUEST
         //
