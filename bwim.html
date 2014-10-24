@@ -4,16 +4,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scaleable=no" />
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <meta name="applie-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="description" content="bwim" />
 
   <title>Manitoba BWIM Event Viewer</title>
-  <link href="http://cdn.syncfusion.com/js/mobile/ej.mobile.all-latest.min.css" rel="stylesheet" />
+  <link href="http://cdn.syncfusion.com/js/web/flat-azure/ej.web.all-latest.min.css" rel="stylesheet" />
   <script type="text/javascript" src="socket.io-1.1.0.js"></script>
-  <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
-  <script type="text/javascript" src="syncfusion/assets/external/jquery.globalize.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+  <script src="http://ajax.aspnetcdn.com/ajax/globalize/0.1.1/globalize.min.js"></script>
   <script type="text/javascript" src="http://borismoore.github.io/jsrender/jsrender.min.js"></script>
-  <script type="text/javascript" src="http://cdn.syncfusion.com/js/mobile/ej.mobile.all-latest.min.js"></script>
+  <script type="text/javascript" src="http://cdn.syncfusion.com/js/ej.widgets.all-latest.min.js"></script>
 
   </head>
   <body>
@@ -30,18 +31,15 @@
         <option selected value="9">09 (SEP)</option>
       </select>
     </div>
-    <div id="mobgrid"></div>
+    <div id="mobgrid" style="width: 100%;"></div>
   </div>
 
 
 
-
-    <script type="text/javascript">
+  <!-- this should be moved to a separate script file -->
+  <script type="text/javascript">
     $(function() {
-
-
-        // This one won't actually have the values that are required so much anymore
-
+        // TODO maybe move the configuration to another object/definition.
         var socket = io.connect("misc.mathewgrabau.ca:8888/");
         var firstTime = true;
 
@@ -49,6 +47,10 @@
         var bridgeEvents = [];
 
         var requestId = 0;
+        
+        function nextRequestId() {
+          return (requestId++);
+        }
 
         socket.on("news", function(data) {
             if (!firstTime) {
@@ -58,45 +60,36 @@
             firstTime = false;
 
             // Initialize the grid now, start getting the data better
-
             var dataRequest = {
               sensorType: "bwimEvents",
               date: 20140901,
-              id: requestId
+              id: nextRequestId()
             };
-
-            requestId++;
 
             socket.emit("req", JSON.stringify(dataRequest));
 
         });
 
         $("#month").change(function() {
-
-            console.log($(this).val());
-
             // TODO we need to get the values for the day in there as well.
-
-
             var month = parseInt($(this).val());
 
             // Then the parsing of the requested values must be sent out.
             var d = parseInt($("#year").val()) * 10000 + parseInt($("#month").val()) * 100 + 01;
 
-            console.log(d);
+            //console.log(d);
 
             var request = {
               sensorType: "bwimEvents",
               date: d,
-              id: requestId
-              };
+              id: nextRequestId()
+            };
 
-              requestId++;
-
+            // Send the request to the proper values.
             socket.emit("req", JSON.stringify(request));
-            });
+        });
 
-        var dataManager= null;
+        var dataManager = null;
         var receivedData = [];
 
         var firstEventSelection = true;
@@ -109,8 +102,6 @@
             // Get the data back from the parsing of the values that are attempting to be created.
             var received = JSON.parse(data);
 
-            console.log(received);
-
             currentEventData = received;
 
             // Determine if the values exists yet.
@@ -118,21 +109,30 @@
               firstEventSelection = false;
 
               $(".appview").append("<div id='section-selector'></div>");
-              $("#section-selector").append("<label><input type='radio' />AA</label>");
-              $("#section-selector").append("<label><input type='radio' />CC</label>");
-              $("#section-selector").append("<label><input type='radio' />DD</label>");
-
-              $("#section-selector").ejmGroupButton({
-                  touchEnd: sectionGroupTouchEnd
-                });
+              $("#appview").append("<div id='section-selector'></div>");
+              $("#section-selector").append("<input type='button' id='show-aa' value='AA' />");
+              $("#section-selector").append("<input type='button' id='show-cc' value='CC' />");
+              $("#section-selector").append("<input type='button' id='show-dd' value='DD' />");
             }
+            
+            // Create the tabs that will be used there.
+            $("#show-aa").ejButton({
+              click: sectionGroupTouchEnd
+            });
+            $("#show-cc").ejButton({
+              click: sectionGroupTouchEnd
+            });
+            $("#show-dd").ejButton({
+              click: sectionGroupTouchEnd
+            });
         });
 
         function sectionGroupTouchEnd(args) {
-          console.log(args.text);
-          updateSectionChart(args.text);
+          var sectionText = args.model.text;
+          updateSectionChart(sectionText);
         }
 
+        // The response for the server posting the event data back.
         socket.on("req_data", function(data) {
             var received = JSON.parse(data);
 
@@ -145,14 +145,14 @@
               dataManager = ej.DataManager(receivedData);
 
               // There are too many items (it only seems to show 14 of them)
-              $("#mobgrid").ejmGrid({
+              $("#mobgrid").ejGrid({
                   dataSource: dataManager,
                   allowSelection: true,
                   allowColumnSelector: true,
                   allowPaging: true,
                   allowScrolling: true,
-                  scrollSettings: {enableColumnScrolling: true}, 
-
+                  //scrollSettings: {enableColumnScrolling: true}, 
+                  width: 1000,
                   actionComplete: gridActionComplete,
 
                   rowSelected: gridRowSelected,
@@ -195,7 +195,6 @@
           console.log(arguments);
 
           if (gridFirstEvent) {
-                        // Then install/generate the first.
           }
         }
             
@@ -222,6 +221,7 @@
           var MONTH_SHIFT = DAY_SHIFT * DAY_SIZE;
           var MONTH_SIZE = 100;
           var YEAR_SHIFT = MONTH_SHIFT * MONTH_SIZE;
+          
           
           // Create the proper date now
           var year = parseInt($("#year").val()) * YEAR_SHIFT;
@@ -273,14 +273,20 @@
                 // TOOD probably need to implement some proper mapping events there
 
                 var seriesG25 = [];
+                var seriesG26 = [];
 
                 currentEventData.aa.forEach(function(element, index, array) {
+                    // Compile up the data into the various series now.
                     seriesG25.push({
                         value: element.G25,
                         date: element.ms
                         });
+                    seriesG26.push({
+                      value: element.G26,
+                      date: element.ms
+                    });
                 });
-
+                
               }
               break;
 
@@ -296,12 +302,55 @@
                 ensureChartReady();
 
                 var seriesG1 = [];
+                var seriesG2 = [];
+                var seriesG3 = [];
+                var seriesG4 = [];
+                var seriesG5 = [];
+                var seriesG6 = [];
+                var seriesG7 = [];
+                var seriesG8 = [];
 
+                // Updating the response for the currentEventData.
                 currentEventData.dd.forEach(function(element, index, array) {
                     seriesG1.push({
-                        value: element.G1,
-                        ms: element.ms
-                        });
+                      value: element.G1,
+                      ms: element.ms
+                    });
+                        
+                    seriesG2.push({
+                      value: element.G2,
+                      ms: element.ms
+                    });
+                    
+                    seriesG3.push({
+                      value: element.G3,
+                      ms: element.ms
+                    });
+                        
+                    seriesG4.push({
+                      value: element.G4,
+                      ms: element.ms
+                    });
+                    
+                    seriesG5.push({
+                      value: element.G1,
+                      ms: element.ms
+                    });
+                        
+                    seriesG6.push({
+                      value: element.G2,
+                      ms: element.ms
+                    });
+                    
+                    seriesG7.push({
+                      value: element.G3,
+                      ms: element.ms
+                    });
+                        
+                    seriesG8.push({
+                      value: element.G4,
+                      ms: element.ms
+                    });
                 });
 
                 currentChartSource = seriesG1;
@@ -310,30 +359,57 @@
                   enable: true,
                   enableMouseWheel: true
                 };
-
-                var commonSeriesOptions = {
-tooltip: {
-           visible: true
-         }
-                };
-
-                console.log(seriesG1);
+                
+                //console.log(seriesG1);
                 $("#chart-container").ejChart({
-commonSeriesOptions: {
-  tooltip: {visible: true}
-},
-                    zooming: zoomingOptions,
-series: [{
-    type: "line",
-    xName: "ms",
-    yName: "value",
-    dataSource: seriesG1,
-  }
-  ]
-              });
-
-                // TODO figure out why the zooming doesn't want to be enabled.
-
+                  commonSeriesOptions: {
+                    tooltip: {visible: true}
+                  },
+                  zooming: zoomingOptions,
+                  // Implementing all 8 at once.
+                  series: [{
+                    type: "line",
+                    xName: "ms",
+                    yName: "value",
+                    dataSource: seriesG1,
+                  }, {
+                    type: "line",
+                    xName: "ms",
+                    yName: "value",
+                    dataSource: seriesG2
+                  }, {
+                    type: "line",
+                    xName: "ms",
+                    yName: "value",
+                    dataSource: seriesG3
+                  }, {
+                    type: "line",
+                    xName: "ms",
+                    yName: "value",
+                    dataSource: seriesG4
+                  }, {
+                    type: "line",
+                    xName: "ms",
+                    yName: "value",
+                    dataSource: seriesG5
+                  }, {
+                    type: "line",
+                    xName: "ms",
+                    yName: "value",
+                    dataSource: seriesG6
+                  }, {
+                    type: "line",
+                    xName: "ms",
+                    yName: "value",
+                    dataSource: seriesG7
+                  }, {
+                    type: "line",
+                    xName: "ms",
+                    yName: "value",
+                    dataSource: seriesG8
+                  }
+                  ]
+                });
               }
               break;
 
