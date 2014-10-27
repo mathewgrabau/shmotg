@@ -301,61 +301,6 @@
               if (currentEventData.dd !== undefined) {
                 ensureChartReady();
 
-                var seriesG1 = [];
-                var seriesG2 = [];
-                var seriesG3 = [];
-                var seriesG4 = [];
-                var seriesG5 = [];
-                var seriesG6 = [];
-                var seriesG7 = [];
-                var seriesG8 = [];
-                
-                /*
-                // Updating the response for the currentEventData.
-                currentEventData.dd.forEach(function(element, index, array) {
-                    seriesG1.push({
-                      value: element.G1,
-                      ms: element.ms
-                    });
-                        
-                    seriesG2.push({
-                      value: element.G2,
-                      ms: element.ms
-                    });
-                    
-                    seriesG3.push({
-                      value: element.G3,
-                      ms: element.ms
-                    });
-                        
-                    seriesG4.push({
-                      value: element.G4,
-                      ms: element.ms
-                    });
-                    
-                    seriesG5.push({
-                      value: element.G1,
-                      ms: element.ms
-                    });
-                        
-                    seriesG6.push({
-                      value: element.G2,
-                      ms: element.ms
-                    });
-                    
-                    seriesG7.push({
-                      value: element.G3,
-                      ms: element.ms
-                    });
-                        
-                    seriesG8.push({
-                      value: element.G4,
-                      ms: element.ms
-                    });
-                });
-                
-                */
-
                 // TODO update the chart method here (should support something better for naming the series here.)
                 currentChartSource = currentEventData.dd;
                 
@@ -381,13 +326,12 @@
                   lastDate = currentDate;
                 });
                 
+                // TODO make the development information.
                 if (dataGaps) {
                   alert("Selected data has time gaps");
                 } else {
                   console.log("Data is good for the time gaps.");
                 }
-                
-                
                 
                 var zoomingOptions = {
                   enable: true,
