@@ -9,6 +9,14 @@
 
   <title>Manitoba BWIM Event Viewer</title>
   <link href="http://cdn.syncfusion.com/js/web/flat-azure/ej.web.all-latest.min.css" rel="stylesheet" />
+  
+  <style type="text/css">
+    #chart-options {
+      border: 1px solid black;
+    };
+  </style>
+  
+  
   <script type="text/javascript" src="socket.io-1.1.0.js"></script>
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
@@ -16,8 +24,11 @@
   <script type="text/javascript" src="http://borismoore.github.io/jsrender/jsrender.min.js"></script>
   <script type="text/javascript" src="http://cdn.syncfusion.com/js/ej.widgets.all-latest.min.js"></script>
   <script type="text/javascript" src="underscore.js"></script>
+  
+  
   </head>
   <body>
+  
 
   <!-- AppView declaration -->
   <div data-role="app$iew">Mobile JS Application
@@ -233,13 +244,6 @@
           var eventRequest = {
             id: requestId,
             sensorType: "eventdata",
-            /*StartTime_AA: e.data.StartTime_AA,
-            EndTime_AA: e.data.EndTime_AA,
-            StartTime_CC: e.data.StartTime_CC,
-            EndTime_CC: e.data.EndTime_CC,
-            StartTime_DD: e.data.StartTime_DD,
-            EndTime_DD: e.data.EndTime_DD
-            */
             StartTime_AA: addYear(e.data.StartTime_AA),
             EndTime_AA: addYear(e.data.EndTime_AA),
             StartTime_CC: addYear(e.data.StartTime_CC),
@@ -253,39 +257,90 @@
         }
 
         var chartReady = false;
-
+        
         function ensureChartReady() {
           if (!chartReady) {
             $(".appview").append("<div id='chart-container'></div>");
+            
+            $("<div id='chart-options'></div>").insertBefore("#chart-container");
+            
             chartReady = true;
           }
         }
+        
+        // Prepare the data for the source events.
+        // @param girders the names of the griders (to determine a sum)
+        // @return Value of the implementations for the description.
+        function prepareSeriesSource(girders) {
+          var dataGaps = false;
+          var lastTimestamp = null;
+        
+          _.each(currentChartSource, function(element) {
+            element.d = new Date(element.ms);
+            var currentTimestamp = element.d;
+            
+            // Take a sum of each of the elements (seeing it across the entire bridge).
+            element.sum = 0;
+            
+            // Sum at the current timestamp
+            _.each(girders, function(girder) {
+              element.sum += element[girder];
+            });
+            
+            if (lastTimestamp != null) {
+              if ((currentTimestamp.getTime() - lastTimestamp.getTime()) > 5) {
+                dataGaps = true;
+              }
+            }
+            lastTimestamp = currentTimestamp;
+          });
+          
+          return dataGaps;
+        }
+        
+        var zoomingOptions = {
+          enable: true,
+          enableMouseWheel: true
+        };
+        
+        var chartRendered = false;
 
         function updateSectionChart(section) {
           switch (section) {
             case "AA":
               if (currentEventData.aa !== undefined) {
                 ensureChartReady();
+                
+                currentChartSource = currentEventData.aa;
 
-                // THen prepare the data for the renderings now. 
-                // There should be nothing to fear here (it should work perfectly, right?)
-
-                // TOOD probably need to implement some proper mapping events there
-
-                var seriesG25 = [];
-                var seriesG26 = [];
-
-                currentEventData.aa.forEach(function(element, index, array) {
-                    // Compile up the data into the various series now.
-                    seriesG25.push({
-                        value: element.G25,
-                        date: element.ms
-                        });
-                    seriesG26.push({
-                      value: element.G26,
-                      date: element.ms
-                    });
+                var girders = ["G25", "G26", "G27", "G28", "G29", "G30", "G31", "G32", "G33", "G34", "G35", "G36", "G37", "G38", "G39", "G40", "G41", "G42", "G43", "G44", "G45", "G46", "G47", "G48"];
+                
+                // TODO needs the recognition of whether or not there are data gaps in the loaded section/set.
+                prepareSeriesSource(girders);
+                
+                var seriesObjects = _.map(girders, function(girder) {
+                  return {
+                    type: "line",
+                    xName: "d",
+                    yName: girder,
+                    dataSource: currentChartSource,
+                    name: girder
+                  };
                 });
+                
+                seriesObjects.push({
+                  type: "line",
+                  xName: "d",
+                  yName: "sum",
+                  dataSource: currentChartSource,
+                  name: "Sum"
+                });
+                
+                if (chartRendered) {
+                  var chartObject = $("#chart-container").data("ejChart");
+                  chartObject.model.series = seriesObjects;
+                  chartObject.redraw();
+                }
                 
               }
               break;
@@ -293,7 +348,42 @@
             case "CC":
               if (currentEventData.cc !== undefined) {
                 ensureChartReady();
-              }
+                
+                currentChartSource = currentEventData.cc;
+                
+                var girders = ["G9", "G10", "G11", "G12", "G13", "G14", "G15", "G16", "G17", "G18", "G19", "G20", "G21", "G22", "G23", "G24"];
+                
+                prepareSeriesSource(girders);
+                
+                // Sum the section data now. 
+                var seriesObjects = _.map(girders, function(girder) {
+                  return {
+                    type: "line",
+                    xName: "d",
+                    yName: girder,
+                    dataSource: currentChartSource,
+                    name: girder
+                  };
+                });
+                
+                seriesObjects.push({
+                  type: "line",
+                  xName: "d",
+                  yName: "sum",
+                  dataSource: currentChartSource,
+                  name: "Sum"
+                });
+                
+                if (chartRendered) {
+                  // Convert the reference to contain the new series, then just redraw it with the current objects.
+                  if (!window.chartObject) {
+                    window.chartObject = $("#chart-container").data("ejChart");
+                  }
+                  window.chartObject.model.series = seriesObjects;
+                  window.chartObject.redraw();
+                }
+                
+              } // if (currentEventData.cc !== undefined)
               break;
 
             case "DD":
@@ -304,66 +394,71 @@
                 // TODO update the chart method here (should support something better for naming the series here.)
                 currentChartSource = currentEventData.dd;
                 
-                // Create the date objects required for processing this range.
-                // NOTE: the date objects do not show the milliseconds properly,
-                // therefore we should put in place a formatting
-                // on the 
-                // Examine the data for gaps?
-                var lastDate = null;
+                var girders = ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8"];
                 
-                var dataGaps = false;
+                var dataGaps = prepareSeriesSource(girders);
                 
-                _.each(currentChartSource, function(element) {
-                  element.d = new Date(element.ms);
-                  var currentDate = element.d;
-                  
-                  if (lastDate != null) {
-                    if ((currentDate.getTime() - lastDate.getTime()) > 5) {
-                      dataGaps = true;
-                    }
-                  }
-                  
-                  lastDate = currentDate;
-                });
-                
-                // TODO make the development information.
                 if (dataGaps) {
                   alert("Selected data has time gaps");
                 } else {
                   console.log("Data is good for the time gaps.");
                 }
                 
-                var zoomingOptions = {
-                  enable: true,
-                  enableMouseWheel: true
-                };
-                
-                var seriesObjects = _.map(["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8"], function(girder) {
+                var seriesObjects = _.map(girders, function(girder) {
                   return {
                     type: "line",
                     xName: "d",
                     yName: girder,
-                    dataSource: currentChartSource
+                    dataSource: currentChartSource,
+                    name: girder
                   };
                 });
                 
-                $("#chart-container").ejChart({
-                  commonSeriesOptions: {
-                    tooltip: {visible: true}
-                  },
-                  zooming: zoomingOptions,
-                  // Implementing all 8 at once.
-                  series: seriesObjects,
-                  primaryXAxis: {
-                    title: { text: "ms" },
-                    valueType: 'datetime',
-                    intervalType: 'Milliseconds'
-                  },
-                  primaryYAxis: {
-                    title: { text: "ustrain" }
-                  }
+                seriesObjects.push({
+                  type: "line",
+                  xName: "d",
+                  yName: "sum",
+                  dataSource: currentChartSource,
+                  name: "Sum"
                 });
-              }
+                
+                if (!chartRendered) {
+                  $("#chart-container").ejChart({
+                    commonSeriesOptions: {
+                      tooltip: {visible: true}
+                    },
+                    zooming: zoomingOptions,
+                    // Implementing all 8 at once.
+                    series: seriesObjects,
+                    primaryXAxis: {
+                      title: { text: "ms" },
+                      valueType: 'datetime',
+                      intervalType: 'Milliseconds'
+                    },
+                    primaryYAxis: {
+                      title: { text: "ustrain" }
+                    },
+                    crosshair: {
+                      visible: true,
+                      type: 'trackball',
+                      marker: {
+                        shape: 'circle',
+                        size: {
+                          height: 9, width: 9
+                        },
+                        visible: true
+                      }
+                    }
+                  });
+                  
+                  // Get the reference for later.
+                  window.chartObject = $("#chart-container").data("ejChart");
+                  
+                  chartRendered = true;
+                } else {
+                  // Then since the chart has already been rendered, we just need to enable the new data and re-render it.
+                } // (chartRendered)
+              } // if (currentEventData.dd !==undefined)
               break;
 
             default:
