@@ -110,8 +110,6 @@
             // Then the parsing of the requested values must be sent out.
             var d = parseInt($("#year").val()) * 10000 + parseInt($("#month").val()) * 100 + 01;
 
-            //console.log(d);
-
             var request = {
               sensorType: "bwimEvents",
               date: d,
@@ -210,7 +208,7 @@
                   dataManager.insert(element);
                   });
 
-              var grid = $("#mobgrid").data("ejmGrid");
+              var grid = $("#mobgrid").data("ejGrid");
               grid.refreshContent();
             }
       });
@@ -290,6 +288,8 @@
           if (activeView == VIEW_EVENT) {
             // Need to prepare the series for the current step now.
             
+            $("<div><div id='event-slider'></div></div>").insertAfter("#chart-container");
+            
             var girders = GIRDERS[currentSection];
             
             var chartData = _.map(girders, function(element, index) {
@@ -304,8 +304,6 @@
             chartData = [{x:0,y:0}].concat(chartData);
             
             // TODO use the onAxesLabelRendering to label the values that are passed there.
-            
-            // This function allows just the tooltip value to be changed
             
             function onToolTipInitialize(sender) {
               console.log(sender);
@@ -344,6 +342,71 @@
                 }
               }],
               toolTipInitialize: onToolTipInitialize
+            });
+            
+            // Maybe having this at the global namespace will help
+            eventSliderStopped = function(args) {
+              // Then get the new value for rendering the chart
+              console.log(args);
+            }
+            
+            $("#event-slider").ejSlider({
+              
+                
+              start: function(args) {
+                console.log("Slider start");
+                return true;
+              },
+              
+              slide: function(args) {
+                console.log("Slide");
+                return true;
+              },
+              
+              // Stop only called on the sliding events, whereas change is called each time.
+              stop: function(args) {
+                console.log("Inside the slider");
+                },
+                
+              change: function(args) {
+                // Rendering the new set of series data.
+                if (args.value >= 0 && args.value < currentChartSource.length) {
+                  var chartObject = $("#chart-container").data("ejChart");
+                  
+                  var dataIndex = args.value;
+                  
+                  // Pluck the new value and change the series update
+                  var updatedSeries = _.map(girders, function(element, index) {
+                    return {
+                      x: index + 1,
+                      y: currentChartSource[dataIndex][element]
+                    };
+                  });
+                  
+                  updatedSeries = [{x:0,y:0}].concat(updatedSeries);
+                  
+                  var chartSeries = chartObject.model.series[0];
+                  
+                  _.each(updatedSeries, function(element, index) {
+                   // console.log(chartSeries.points);
+                    //console.log(element);
+                    // Assign in the new values there now.
+                    chartSeries.points[element.x].y = element.y;
+                  });
+                  
+                  chartObject.redraw();
+                }
+               
+                return true;
+              },
+                
+              height: 16,
+              incrementStep: 1,
+              minValue: 0,
+              value: 0,
+              maxValue: currentChartSource.length,
+              // TODO consider using a start event to make some waiting rendering or something.
+              
             });
           } else {
             throw "Invalid selection of the event viewer type";
