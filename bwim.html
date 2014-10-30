@@ -8,6 +8,8 @@
   <meta name="description" content="bwim" />
 
   <title>Manitoba BWIM Event Viewer</title>
+  <!--<link href="http://cdn.syncfusion.com/js/web/ej.widgets.core-latest.min.css" rel="stylesheet" />-->
+  <link href="syncfusion/assets/css/web/ej.widgets.core.min.css" rel="stylesheet" />
   <link href="http://cdn.syncfusion.com/js/web/flat-azure/ej.web.all-latest.min.css" rel="stylesheet" />
   
   <style type="text/css">
@@ -25,13 +27,13 @@
   <script type="text/javascript" src="http://cdn.syncfusion.com/js/ej.widgets.all-latest.min.js"></script>
   <script type="text/javascript" src="underscore.js"></script>
   
+  <script type="text/javascript" src="sammy.js"></script>
   
   </head>
   <body>
   
-
   <!-- AppView declaration -->
-  <div data-role="app$iew">Mobile JS Application
+  <div data-role="app$iew">BWIM Event Viewer
     <div><select id="year">
         <option value="2014">2014</option>
       </select>
@@ -46,9 +48,30 @@
   </div>
 
 
+  <script type="text/javascript">
+  /*$(function() {
+    // TODO figure out if you want to continue in this direction (I don't know that you do.
+    var app = $.sammy('#main', function() {
+    
+    
+      this.route('get', '#/', function() {
+      console.log("In here");
+      });
+    });
+    
+    app.run('#/');
+  <!-- this script block defines the routes that are being used in the application. -->
+  
+  });*/
+  
+  </script>
+  
 
   <!-- this should be moved to a separate script file -->
   <script type="text/javascript">
+  
+  
+  
     $(function() {
         // TODO maybe move the configuration to another object/definition.
         var socket = io.connect("misc.mathewgrabau.ca:8888/");
@@ -155,7 +178,6 @@
               receivedData = received.events;
               dataManager = ej.DataManager(receivedData);
 
-              // There are too many items (it only seems to show 14 of them)
               $("#mobgrid").ejGrid({
                   dataSource: dataManager,
                   allowSelection: true,
@@ -178,20 +200,16 @@
                     });
             } else {
 
-              console.log(dataManager);
-
-
               // Apparently this is the most efficient way to do this.
+              // Clearning the array that is.
               while (receivedData.length) {
                 receivedData.pop();
               }
-
-
+              
               // NOTE: I may need a specific value to insert properly.
               received.events.forEach(function(element, index) {
                   dataManager.insert(element);
                   });
-
 
               var grid = $("#mobgrid").data("ejmGrid");
               grid.refreshContent();
@@ -253,10 +271,95 @@
           };
 
           socket.emit("req", JSON.stringify(eventRequest));
-
         }
 
         var chartReady = false;
+        
+        // Two viewing types
+        var VIEW_SECTION = 0;
+        var VIEW_EVENT = 1;
+        var activeView = VIEW_SECTION;
+        
+        var GIRDERS = {
+          "AA": ["G25", "G26", "G27", "G28", "G29", "G30", "G31", "G32", "G33", "G34", "G35", "G36", "G37", "G38", "G39", "G40", "G41", "G42", "G43", "G44", "G45", "G46", "G47", "G48"],
+          "CC": ["G9", "G10", "G11", "G12", "G13", "G14", "G15", "G16", "G17", "G18", "G19", "G20", "G21", "G22", "G23", "G24"],
+          "DD": ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8"]
+          };
+        
+        // Implements the viewing that allows for showing an event in a given section.
+        function createEventViewer() {
+          if (activeView == VIEW_EVENT) {
+            // Need to prepare the series for the current step now.
+            
+            // Rendering the values in the following order of them.
+            //var seriesData = _.map(currentEventData, function(element
+            
+            var girders = GIRDERS[currentSection];
+            
+            var chartData = _.map(girders, function(element, index) {
+              return {
+                x: index + 1,
+                y: currentChartSource[0][element]
+              };
+            });
+            
+            // Insering a dummy point,
+            // And should also insert one after.
+            chartData = [{x:0,y:0}].concat(chartData);
+            
+            // Rendering the new Syncfusion chart now (showing a spline to capture the data effectively)
+            // TODO investigate the custom labelling (so that we could have proper "G1", etc shown
+            // TODO this could also be a diagram underlayed there (perhaps just use the image and render it on there
+            $("#chart-container").ejChart({
+              commonSeriesOptions: {
+                type: "spline",
+                enableAnimation: true,
+                marker:
+                              {
+                                  shape: 'circle',
+
+                                  size:
+                                  {
+                                      height: 10, width: 10
+                                  },
+                                  visible: true
+                              },
+              },
+              title: "Section " + currentSection + " Event " + 0,
+              series: [{
+                points: chartData,
+                opacity: 0.5, border :{color: 'transparent'}, fill: '#6A4B82',
+                name: currentSection
+              }]
+            });
+          } else {
+            throw "Invalid selection of the event viewer type";
+          }
+        }
+        
+        function sectionTypeChanged(args) {
+          if (args.isChecked) {
+            console.log("changing to ");
+            console.log(args.model);
+            
+            if (args.model.id == "chartType-event") {
+              console.log("Rendering the event chart now");
+              activeView = VIEW_EVENT;
+              createEventViewer();
+            } else if (args.model.id == "chartType-section") {
+              console.log("Rendering the section chart now");
+              activeView = VIEW_SECTION;
+            }
+          } else {
+            // Remove the chart and start rendering it again.
+            if (chartObject) {
+              chartObject.destroy();
+              chartReady = false;
+              chartObject = null;
+            }
+          }
+        };
+        
         
         function ensureChartReady() {
           if (!chartReady) {
@@ -264,8 +367,22 @@
             
             $("<div id='chart-options'></div>").insertBefore("#chart-container");
             
+            $("#chart-options").append("<div><div>Chart Type</div><table><tr><td><td><input type='radio' name='charttype' id='chartType-section' /><label for='chartType-section'>Section</label></td><td><input type='radio' name='charttype' id='chartType-event' /><label for='chartType-event'>Event</label></td></tr></table></div>");
+            
+            // Initialize the radio buttons now
+            $("#chartType-section").ejRadioButton({checked: true, size: "large", change: sectionTypeChanged});
+            $("#chartType-event").ejRadioButton({size: "large", change: sectionTypeChanged});
+            
             chartReady = true;
           }
+        }
+        
+        function addColumnSelectors(girders) {
+          _.each(girders, function(element) {
+            $("#chart-options").append("<input type='checkbox' value='" + element + "' />");
+          });
+          
+          $("#chart-options").apppend("<input type='checbox' value='sum' />");
         }
         
         // Prepare the data for the source events.
@@ -306,6 +423,9 @@
         var chartRendered = false;
 
         function updateSectionChart(section) {
+          // The currently displayed section.
+          window.currentSection = section;
+        
           switch (section) {
             case "AA":
               if (currentEventData.aa !== undefined) {
@@ -387,7 +507,6 @@
               break;
 
             case "DD":
-
               if (currentEventData.dd !== undefined) {
                 ensureChartReady();
 
