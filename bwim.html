@@ -66,7 +66,6 @@
   
   </script>
   
-
   <!-- this should be moved to a separate script file -->
   <script type="text/javascript">
   
@@ -285,14 +284,11 @@
           "CC": ["G9", "G10", "G11", "G12", "G13", "G14", "G15", "G16", "G17", "G18", "G19", "G20", "G21", "G22", "G23", "G24"],
           "DD": ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8"]
           };
-        
+          
         // Implements the viewing that allows for showing an event in a given section.
         function createEventViewer() {
           if (activeView == VIEW_EVENT) {
             // Need to prepare the series for the current step now.
-            
-            // Rendering the values in the following order of them.
-            //var seriesData = _.map(currentEventData, function(element
             
             var girders = GIRDERS[currentSection];
             
@@ -303,9 +299,22 @@
               };
             });
             
-            // Insering a dummy point,
+            // Inserting a dummy point,
             // And should also insert one after.
             chartData = [{x:0,y:0}].concat(chartData);
+            
+            // TODO use the onAxesLabelRendering to label the values that are passed there.
+            
+            // This function allows just the tooltip value to be changed
+            
+            function onToolTipInitialize(sender) {
+              console.log(sender);
+              // Just one of the series in this particular chart.
+              if (sender.data.pointIndex > 0 && sender.data.pointIndex <= GIRDERS[currentSection].length) {
+                // Rendering in the label with the value.
+                sender.data.currentText = GIRDERS[currentSection][sender.data.pointIndex - 1] + " = " + sender.model.series[sender.data.seriesIndex].points[sender.data.pointIndex].y;
+              }
+            }
             
             // Rendering the new Syncfusion chart now (showing a spline to capture the data effectively)
             // TODO investigate the custom labelling (so that we could have proper "G1", etc shown
@@ -329,8 +338,12 @@
               series: [{
                 points: chartData,
                 opacity: 0.5, border :{color: 'transparent'}, fill: '#6A4B82',
-                name: currentSection
-              }]
+                name: currentSection,
+                tooltip: {
+                  visible: true
+                }
+              }],
+              toolTipInitialize: onToolTipInitialize
             });
           } else {
             throw "Invalid selection of the event viewer type";
