@@ -12,14 +12,14 @@
   <link href="syncfusion/assets/css/web/ej.widgets.core.min.css" rel="stylesheet" />
   <!-- <link href="http://cdn.syncfusion.com/js/web/flat-azure/ej.web.all-latest.min.css" rel="stylesheet" />-->
   <link href="syncfusion/assets/css/web/bootstrap-theme/ej.web.all.css" rel="stylesheet" />
-  
+
   <style type="text/css">
     #chart-options {
       border: 1px solid black;
     };
   </style>
-  
-  
+
+
   <script type="text/javascript" src="socket.io-1.1.0.js"></script>
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
@@ -27,14 +27,14 @@
   <script type="text/javascript" src="http://borismoore.github.io/jsrender/jsrender.min.js"></script>
   <script type="text/javascript" src="syncfusion/assets/scripts/web/ej.web.all.min.js"></script>
   <script type="text/javascript" src="underscore.js"></script>
-  
+
   <script type="text/javascript" src="sammy.js"></script>
-  
+
   </head>
   <body>
-  
+
   <!-- AppView declaration -->
-  <div data-role="appview">BWIM Event Viewer
+  <div id="appview" data-role="appview">BWIM Event Viewer
     <div><select id="year">
         <option value="2014">2014</option>
       </select>
@@ -53,25 +53,25 @@
   /*$(function() {
     // TODO figure out if you want to continue in this direction (I don't know that you do.
     var app = $.sammy('#main', function() {
-    
-    
+
+
       this.route('get', '#/', function() {
       console.log("In here");
       });
     });
-    
+
     app.run('#/');
   <!-- this script block defines the routes that are being used in the application. -->
-  
+
   });*/
-  
+
   </script>
-  
+
   <!-- this should be moved to a separate script file -->
   <script type="text/javascript">
-  
-  
-  
+
+
+
     $(function() {
         // TODO maybe move the configuration to another object/definition.
         var socket = io.connect("fbsd.mathewgrabau.ca:8888/");
@@ -81,7 +81,7 @@
         var bridgeEvents = [];
 
         var requestId = 0;
-        
+
         function nextRequestId() {
           return (requestId++);
         }
@@ -140,7 +140,7 @@
             if (firstEventSelection) {
               firstEventSelection = false;
 
-              $(".appview").append("<div id='section-selector'></div>");
+              //$(".appview").append("<div id='section-selector'></div>");
               $("#appview").append("<div id='section-selector'></div>");
               $("#section-selector").append("<input type='button' id='show-aa' value='AA' />");
               $("#section-selector").append("<input type='button' id='show-cc' value='CC' />");
@@ -153,22 +153,31 @@
                   click: sectionGroupTouchEnd
                   });
             } else {
+
               console.log("we have not found the element that should have been created");
             }
 
+            buttonElement = $("#show-cc");
+            if (buttonElement.size()) {
+              $(buttonElement).ejButton({
+                click: sectionGroupTouchEnd
+              });
+            } else {
+              alert("show-cc not found");
+            }
+
+            buttonElement = $("#show-dd");
+            if (buttonElement.size()) {
+              $(buttonElement).ejButton({
+                click: sectionGroupTouchEnd
+              });
+            }
+
             // Create the tabs that will be used there.
-            $("#show-aa").ejButton({
-              click: sectionGroupTouchEnd
-            });
-            $("#show-cc").ejButton({
-              click: sectionGroupTouchEnd
-            });
-            $("#show-dd").ejButton({
-              click: sectionGroupTouchEnd
-            });
         });
 
         function sectionGroupTouchEnd(args) {
+          console.log("sectionGroupTouchEnd");
           var sectionText = args.model.text;
           updateSectionChart(sectionText);
         }
@@ -192,7 +201,7 @@
                   allowColumnSelector: true,
                   allowPaging: true,
                   allowScrolling: true,
-                  //scrollSettings: {enableColumnScrolling: true}, 
+                  //scrollSettings: {enableColumnScrolling: true},
                   width: 1000,
                   actionComplete: gridActionComplete,
 
@@ -213,7 +222,7 @@
               while (receivedData.length) {
                 receivedData.pop();
               }
-              
+
               // NOTE: I may need a specific value to insert properly.
               received.events.forEach(function(element, index) {
                   dataManager.insert(element);
@@ -234,7 +243,7 @@
           if (gridFirstEvent) {
           }
         }
-            
+
 
         function gridRowSelected(e) {
           console.log(e);
@@ -258,8 +267,8 @@
           var MONTH_SHIFT = DAY_SHIFT * DAY_SIZE;
           var MONTH_SIZE = 100;
           var YEAR_SHIFT = MONTH_SHIFT * MONTH_SIZE;
-          
-          
+
+
           // Create the proper date now
           var year = parseInt($("#year").val()) * YEAR_SHIFT;
 
@@ -283,40 +292,40 @@
         }
 
         var chartReady = false;
-        
+
         // Two viewing types
         var VIEW_SECTION = 0;
         var VIEW_EVENT = 1;
         var activeView = VIEW_SECTION;
-        
+
         var GIRDERS = {
           "AA": ["G25", "G26", "G27", "G28", "G29", "G30", "G31", "G32", "G33", "G34", "G35", "G36", "G37", "G38", "G39", "G40", "G41", "G42", "G43", "G44", "G45", "G46", "G47", "G48"],
           "CC": ["G9", "G10", "G11", "G12", "G13", "G14", "G15", "G16", "G17", "G18", "G19", "G20", "G21", "G22", "G23", "G24"],
           "DD": ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8"]
           };
-          
+
         // Implements the viewing that allows for showing an event in a given section.
         function createEventViewer() {
           if (activeView == VIEW_EVENT) {
             // Need to prepare the series for the current step now.
-            
+
             $("<div><div id='event-slider'></div></div>").insertAfter("#chart-container");
-            
+
             var girders = GIRDERS[currentSection];
-            
+
             var chartData = _.map(girders, function(element, index) {
               return {
                 x: index + 1,
                 y: currentChartSource[0][element]
               };
             });
-            
+
             // Inserting a dummy point,
             // And should also insert one after.
             chartData = [{x:0,y:0}].concat(chartData);
-            
+
             // TODO use the onAxesLabelRendering to label the values that are passed there.
-            
+
             function onToolTipInitialize(sender) {
               console.log(sender);
               // Just one of the series in this particular chart.
@@ -325,7 +334,7 @@
                 sender.data.currentText = GIRDERS[currentSection][sender.data.pointIndex - 1] + " = " + sender.model.series[sender.data.seriesIndex].points[sender.data.pointIndex].y;
               }
             }
-            
+
             // Rendering the new Syncfusion chart now (showing a spline to capture the data effectively)
             // TODO investigate the custom labelling (so that we could have proper "G1", etc shown
             // TODO this could also be a diagram underlayed there (perhaps just use the image and render it on there
@@ -355,38 +364,38 @@
               }],
               toolTipInitialize: onToolTipInitialize
             });
-            
+
             // Maybe having this at the global namespace will help
             eventSliderStopped = function(args) {
               // Then get the new value for rendering the chart
               console.log(args);
             }
-            
+
             $("#event-slider").ejSlider({
-              
-                
+
+
               start: function(args) {
                 console.log("Slider start");
                 return true;
               },
-              
+
               slide: function(args) {
                 console.log("Slide");
                 return true;
               },
-              
+
               // Stop only called on the sliding events, whereas change is called each time.
               stop: function(args) {
                 console.log("Inside the slider");
                 },
-                
+
               change: function(args) {
                 // Rendering the new set of series data.
                 if (args.value >= 0 && args.value < currentChartSource.length) {
                   var chartObject = $("#chart-container").data("ejChart");
-                  
+
                   var dataIndex = args.value;
-                  
+
                   // Pluck the new value and change the series update
                   var updatedSeries = _.map(girders, function(element, index) {
                     return {
@@ -394,42 +403,44 @@
                       y: currentChartSource[dataIndex][element]
                     };
                   });
-                  
+
                   updatedSeries = [{x:0,y:0}].concat(updatedSeries);
-                  
+
                   var chartSeries = chartObject.model.series[0];
-                  
+
                   _.each(updatedSeries, function(element, index) {
                    // console.log(chartSeries.points);
                     //console.log(element);
                     // Assign in the new values there now.
                     chartSeries.points[element.x].y = element.y;
                   });
-                  
+
                   chartObject.redraw();
                 }
-               
+
                 return true;
               },
-                
+
               height: 16,
               incrementStep: 1,
               minValue: 0,
               value: 0,
               maxValue: currentChartSource.length,
               // TODO consider using a start event to make some waiting rendering or something.
-              
+
             });
           } else {
             throw "Invalid selection of the event viewer type";
           }
         }
-        
+
+        // Event handler for when the section type is changed (making it
+        // easier to handle the changes in the application)
         function sectionTypeChanged(args) {
           if (args.isChecked) {
             console.log("changing to ");
             console.log(args.model);
-            
+
             if (args.model.id == "chartType-event") {
               console.log("Rendering the event chart now");
               activeView = VIEW_EVENT;
@@ -447,51 +458,152 @@
             }
           }
         };
-        
-        
+
+
         function ensureChartReady() {
+          console.log("ensureChartReady");
           if (!chartReady) {
-            $(".appview").append("<div id='chart-container'></div>");
-            
+            $("#appview").append("<div id='chart-container'></div>");
+
             $("<div id='chart-options'></div>").insertBefore("#chart-container");
-            
+
             $("#chart-options").append("<div><div>Chart Type</div><table><tr><td><td><input type='radio' name='charttype' id='chartType-section' /><label for='chartType-section'>Section</label></td><td><input type='radio' name='charttype' id='chartType-event' /><label for='chartType-event'>Event</label></td></tr></table></div>");
-            
+
+            // Append the east bound, west bound toggles
+            $("#chart-options").append("<div><div>Side Selection</div><table><tr><td><input type='checkbox' id='eastBoundCheckBox' /><label for='eastBoundCheckBox'>East Bound</label></td><td><input type='checkbox' id='westBoundCheckBox' /><label for='westBoundCheckBox'>West Bound</label></td></tr></div>");
+
             // Initialize the radio buttons now
             $("#chartType-section").ejRadioButton({checked: true, size: "large", change: sectionTypeChanged});
             $("#chartType-event").ejRadioButton({size: "large", change: sectionTypeChanged});
-            
+            $("#eastBoundCheckBox").ejCheckBox({
+              checked: true,
+              change: eastBoundCheckChanged
+              });
+            $("#westBoundCheckBox").ejCheckBox({
+              checked: true,
+              change: westBoundCheckChanged
+            });
+
+
             chartReady = true;
           }
         }
-        
+
+        // These two objects are used to manage the showing/hiding of the columns.
+
+        window.eastBoundColumns = {
+          "DD": ["G1", "G2", "G3", "G4"]
+        };
+
+        window.westBoundColumns = {
+          "DD": ["G5", "G6", "G7", "G8"]
+        }
+
+
+        function showEastBoundColumns() {
+          var series = $("#chart-container").data("ejChart").model.series;
+
+          for (var i = 0; i < series.length; i++) {
+            for (var j = 0; j < window.eastBoundColumns[window.currentSection].length; j++) {
+              if (window.eastBoundColumns[window.currentSection][j] == series[i].name) {
+                series[i].visibility = "visible";
+              }
+            }
+          }
+
+          $("#chart-container").ejChart("redraw");
+        }
+
+        // Apply the hiding to the east bound columns in the chart.
+        function hideEastBoundColumns() {
+          var series = $("#chart-container").data("ejChart").model.series;
+
+          for (var i = 0; i < series.length; i++) {
+            for (var j = 0; j < window.eastBoundColumns[window.currentSection].length; j++) {
+              if (window.eastBoundColumns[window.currentSection][j] == series[i].name) {
+                series[i].visibility = "hidden";
+              }
+            }
+          }
+
+          $("#chart-container").ejChart("redraw");
+        }
+
+        function showWestBoundColumns() {
+          var series = $("#chart-container").data("ejChart").model.series;
+
+          for (var i = 0; i < series.length; i++) {
+            for (var j = 0; j < window.westBoundColumns[window.currentSection].length; j++) {
+              if (window.westBoundColumns[window.currentSection][j] == series[i].name) {
+                series[i].visibility = "visible";
+              }
+            }
+          }
+
+          $("#chart-container").ejChart("redraw");
+        }
+
+        function hideWestBoundColumns() {
+          var series = $("#chart-container").data("ejChart").model.series;
+
+          for (var i = 0; i < series.length; i++) {
+            for (var j = 0; j < window.westBoundColumns[window.currentSection].length; j++) {
+              if (window.westBoundColumns[window.currentSection][j] == series[i].name) {
+                series[i].visibility = "hidden";
+              }
+            }
+          }
+
+          $("#chart-container").ejChart("redraw");
+        }
+
+        // Event handler for the check box that is on the chart that allows for
+        // updating the chart properly
+        function eastBoundCheckChanged(args) {
+          console.log(args);
+          if (args.isChecked) {
+            showEastBoundColumns();
+          } else {
+            hideEastBoundColumns();
+          }
+        }
+
+        function westBoundCheckChanged(args) {
+          // Show/hide depending on what we need.
+          if (args.isChecked) {
+            showWestBoundColumns();
+          } else {
+            hideWestBoundColumns();
+          }
+        }
+
         function addColumnSelectors(girders) {
           _.each(girders, function(element) {
             $("#chart-options").append("<input type='checkbox' value='" + element + "' />");
           });
-          
+
           $("#chart-options").apppend("<input type='checbox' value='sum' />");
         }
-        
+
         // Prepare the data for the source events.
         // @param girders the names of the griders (to determine a sum)
         // @return Value of the implementations for the description.
         function prepareSeriesSource(girders) {
           var dataGaps = false;
           var lastTimestamp = null;
-        
+
           _.each(currentChartSource, function(element) {
             element.d = new Date(element.ms);
             var currentTimestamp = element.d;
-            
+
             // Take a sum of each of the elements (seeing it across the entire bridge).
             element.sum = 0;
-            
+
             // Sum at the current timestamp
             _.each(girders, function(girder) {
               element.sum += element[girder];
             });
-            
+
             if (lastTimestamp != null) {
               if ((currentTimestamp.getTime() - lastTimestamp.getTime()) > 5) {
                 dataGaps = true;
@@ -499,33 +611,35 @@
             }
             lastTimestamp = currentTimestamp;
           });
-          
+
           return dataGaps;
         }
-        
+
         var zoomingOptions = {
           enable: true,
           enableMouseWheel: true
         };
-        
+
         var chartRendered = false;
 
         function updateSectionChart(section) {
+          console.log("updateSectionChart(" + section +")");
+
           // The currently displayed section.
           window.currentSection = section;
-        
+
           switch (section) {
             case "AA":
               if (currentEventData.aa !== undefined) {
                 ensureChartReady();
-                
+
                 currentChartSource = currentEventData.aa;
 
                 var girders = ["G25", "G26", "G27", "G28", "G29", "G30", "G31", "G32", "G33", "G34", "G35", "G36", "G37", "G38", "G39", "G40", "G41", "G42", "G43", "G44", "G45", "G46", "G47", "G48"];
-                
+
                 // TODO needs the recognition of whether or not there are data gaps in the loaded section/set.
                 prepareSeriesSource(girders);
-                
+
                 var seriesObjects = _.map(girders, function(girder) {
                   return {
                     type: "line",
@@ -535,7 +649,7 @@
                     name: girder
                   };
                 });
-                
+
                 seriesObjects.push({
                   type: "line",
                   xName: "d",
@@ -543,27 +657,27 @@
                   dataSource: currentChartSource,
                   name: "Sum"
                 });
-                
+
                 if (chartRendered) {
                   var chartObject = $("#chart-container").data("ejChart");
                   chartObject.model.series = seriesObjects;
                   chartObject.redraw();
                 }
-                
+
               }
               break;
 
             case "CC":
               if (currentEventData.cc !== undefined) {
                 ensureChartReady();
-                
+
                 currentChartSource = currentEventData.cc;
-                
+
                 var girders = ["G9", "G10", "G11", "G12", "G13", "G14", "G15", "G16", "G17", "G18", "G19", "G20", "G21", "G22", "G23", "G24"];
-                
+
                 prepareSeriesSource(girders);
-                
-                // Sum the section data now. 
+
+                // Sum the section data now.
                 var seriesObjects = _.map(girders, function(girder) {
                   return {
                     type: "line",
@@ -573,7 +687,7 @@
                     name: girder
                   };
                 });
-                
+
                 seriesObjects.push({
                   type: "line",
                   xName: "d",
@@ -581,7 +695,7 @@
                   dataSource: currentChartSource,
                   name: "Sum"
                 });
-                
+
                 if (chartRendered) {
                   // Convert the reference to contain the new series, then just redraw it with the current objects.
                   if (!window.chartObject) {
@@ -590,7 +704,7 @@
                   window.chartObject.model.series = seriesObjects;
                   window.chartObject.redraw();
                 }
-                
+
               } // if (currentEventData.cc !== undefined)
               break;
 
@@ -600,17 +714,17 @@
 
                 // TODO update the chart method here (should support something better for naming the series here.)
                 currentChartSource = currentEventData.dd;
-                
+
                 var girders = ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8"];
-                
+
                 var dataGaps = prepareSeriesSource(girders);
-                
+
                 if (dataGaps) {
                   alert("Selected data has time gaps");
                 } else {
                   console.log("Data is good for the time gaps.");
                 }
-                
+
                 var seriesObjects = _.map(girders, function(girder) {
                   return {
                     type: "line",
@@ -620,7 +734,7 @@
                     name: girder
                   };
                 });
-                
+
                 seriesObjects.push({
                   type: "line",
                   xName: "d",
@@ -628,7 +742,7 @@
                   dataSource: currentChartSource,
                   name: "Sum"
                 });
-                
+
                 if (!chartRendered) {
                   $("#chart-container").ejChart({
                     commonSeriesOptions: {
@@ -657,10 +771,10 @@
                       }
                     }
                   });
-                  
+
                   // Get the reference for later.
                   window.chartObject = $("#chart-container").data("ejChart");
-                  
+
                   chartRendered = true;
                 } else {
                   // Then since the chart has already been rendered, we just need to enable the new data and re-render it.
@@ -673,7 +787,7 @@
           }
         }
     });
-        
+
     </script>
   </body>
 </html>
