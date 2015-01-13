@@ -10,7 +10,8 @@
   <title>Manitoba BWIM Event Viewer</title>
   <!--<link href="http://cdn.syncfusion.com/js/web/ej.widgets.core-latest.min.css" rel="stylesheet" />-->
   <link href="syncfusion/assets/css/web/ej.widgets.core.min.css" rel="stylesheet" />
-  <link href="http://cdn.syncfusion.com/js/web/flat-azure/ej.web.all-latest.min.css" rel="stylesheet" />
+  <!-- <link href="http://cdn.syncfusion.com/js/web/flat-azure/ej.web.all-latest.min.css" rel="stylesheet" />-->
+  <link href="syncfusion/assets/css/web/bootstrap-theme/ej.web.all.css" rel="stylesheet" />
   
   <style type="text/css">
     #chart-options {
@@ -24,7 +25,7 @@
   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
   <script src="http://ajax.aspnetcdn.com/ajax/globalize/0.1.1/globalize.min.js"></script>
   <script type="text/javascript" src="http://borismoore.github.io/jsrender/jsrender.min.js"></script>
-  <script type="text/javascript" src="http://cdn.syncfusion.com/js/ej.widgets.all-latest.min.js"></script>
+  <script type="text/javascript" src="syncfusion/assets/scripts/web/ej.web.all.min.js"></script>
   <script type="text/javascript" src="underscore.js"></script>
   
   <script type="text/javascript" src="sammy.js"></script>
@@ -33,7 +34,7 @@
   <body>
   
   <!-- AppView declaration -->
-  <div data-role="app$iew">BWIM Event Viewer
+  <div data-role="appview">BWIM Event Viewer
     <div><select id="year">
         <option value="2014">2014</option>
       </select>
@@ -73,7 +74,7 @@
   
     $(function() {
         // TODO maybe move the configuration to another object/definition.
-        var socket = io.connect("misc.mathewgrabau.ca:8888/");
+        var socket = io.connect("fbsd.mathewgrabau.ca:8888/");
         var firstTime = true;
 
         // This is the one getting bound to my events of the data now.
@@ -145,7 +146,16 @@
               $("#section-selector").append("<input type='button' id='show-cc' value='CC' />");
               $("#section-selector").append("<input type='button' id='show-dd' value='DD' />");
             }
-            
+
+            var buttonElement = $("#show-aa");
+            if (buttonElement.size()) {
+              $(buttonElement).ejButton({
+                  click: sectionGroupTouchEnd
+                  });
+            } else {
+              console.log("we have not found the element that should have been created");
+            }
+
             // Create the tabs that will be used there.
             $("#show-aa").ejButton({
               click: sectionGroupTouchEnd
@@ -173,6 +183,7 @@
             if (dataManager == null) {
 
               receivedData = received.events;
+              // Generating the DataManager instance
               dataManager = ej.DataManager(receivedData);
 
               $("#mobgrid").ejGrid({
@@ -256,6 +267,7 @@
             return year + x;
           }
 
+          // Encoding the request for the events into the values there.
           var eventRequest = {
             id: requestId,
             sensorType: "eventdata",
