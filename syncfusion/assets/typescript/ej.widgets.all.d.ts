@@ -1,6 +1,16 @@
-﻿/// <reference path="jquery.d.ts"/>
+/*!
+*  filename: ej.widgets.all.d.ts
+*  version : 12.3
+*  Copyright Syncfusion Inc. 2001 - 2014. All rights reserved.
+*  Use of this code is subject to the terms of our license.
+*  A copy of the current license can be obtained at any time by e-mailing
+*  licensing@syncfusion.com. Any infringement will be prosecuted under
+*  applicable laws. 
+*/
+/// <reference path="jquery.d.ts"/>
 declare module EJ.Core {
-    class WidgetBase {
+	
+ class WidgetBase {
         destroy(): void;
         element: JQuery;
         setModel(options: Object, forceSet?: boolean)
@@ -24,12 +34,9 @@ declare module EJ.Core {
         type: string;       
     }
 }
-
-
-
 declare module ej {
-  //#region common
-    class DataManager {
+	
+ class DataManager {
         constructor(dataSource: any, query: ej.Query, adaptor?: Function); 
         setDefaultQuery(query: ej.Query): void;
         executeQuery(query?: ej.Query, done?: Function, fail?: Function, always?: Function): JQueryPromise<any>;
@@ -254,49 +261,7 @@ declare module ej {
         async?: boolean;
     }
 
-    //#endregion common   
-    
-    //#region button
-    class Button extends EJ.Core.Widget {
-        static fn: Button;             
-        constructor(element: JQuery, options?: ButtonOptions);     
-        constructor(element: Element, options?: ButtonOptions);     
-        disable(): void;
-        enable(): void;        
-    }
-
-    interface ButtonOptions {
-        size?: string;
-        type?: string;
-        height?: number;
-        width?: number;
-        enabled?: boolean;
-        text?: string;
-        contentType?: string;
-        imagePosition?: string;
-        showRoundedCorner?: boolean;
-        cssClass?: string;
-        prefixIcon?: string;
-        suffixIcon?: string;
-        enableRTL?: boolean;
-        repeatButton?: boolean;
-        timeInterval?: string;
-        create? (e: ButtonEvent): void;
-        click? (e: ButtonClickEvent): void;
-        destroy? (e: ButtonEvent): void;       
-    }
-
-    interface ButtonEvent extends EJ.Core.BaseEvent {
-        model: ButtonOptions;       
-    }
-
-    interface ButtonClickEvent extends EJ.Core.BaseEvent, ButtonEvent {        
-        status: boolean;
-    }
-    //#endregion button
-
-    //#region Accordion
-    class Accordion extends EJ.Core.Widget {
+ class Accordion extends EJ.Core.Widget {
         static fn: Accordion;
         constructor(element: JQuery, options?: AccordionOptions);
         constructor(element: Element, options?: AccordionOptions);
@@ -366,10 +331,7 @@ declare module ej {
         activeHeader: JQuery;        
     }
    
-     //#endregion Accordion
-
-    //#region AutoComplete
-    class Autocomplete extends EJ.Core.Widget {
+ class Autocomplete extends EJ.Core.Widget {
         static fn: Autocomplete;
         constructor(element: JQuery, options?: AutocompleteOptions);
         constructor(element: Element, options?: AutocompleteOptions);
@@ -452,10 +414,90 @@ declare module ej {
         text: string;
         key: any;
     }
-    //#endregion AutoComplete
+class Button extends EJ.Core.Widget {
+        static fn: Button;             
+        constructor(element: JQuery, options?: ButtonOptions);     
+        constructor(element: Element, options?: ButtonOptions);     
+        disable(): void;
+        enable(): void;        
+    }
 
-    //#region CheckBox
-    class CheckBox extends EJ.Core.Widget {
+    interface ButtonOptions {
+        size?: string;
+        type?: string;
+        height?: number;
+        width?: number;
+        enabled?: boolean;
+        text?: string;
+        contentType?: string;
+        imagePosition?: string;
+        showRoundedCorner?: boolean;
+        cssClass?: string;
+        prefixIcon?: string;
+        suffixIcon?: string;
+        enableRTL?: boolean;
+        repeatButton?: boolean;
+        timeInterval?: string;
+        create? (e: ButtonEvent): void;
+        click? (e: ButtonClickEvent): void;
+        destroy? (e: ButtonEvent): void;       
+    }
+
+    interface ButtonEvent extends EJ.Core.BaseEvent {
+        model: ButtonOptions;       
+    }
+
+    interface ButtonClickEvent extends EJ.Core.BaseEvent, ButtonEvent {        
+        status: boolean;
+    }
+class Captcha extends EJ.Core.Widget {
+        static fn: Captcha;  
+		element: JQuery;		
+        constructor(element: JQuery, options?: CaptchaOptions);     
+        constructor(element: Element, options?: CaptchaOptions);     
+        playAudio():void;
+		formSubmit():void;
+		refresh():void;
+    }
+    interface CaptchaOptions {   
+
+		targetInput?: string,
+        targetButton?:string,
+        height? :number,
+        width? :number,
+        characterSet? : string,
+        maximumLength? :number,             
+        minimumLength? :number,            
+        enableCaseSensitivity? :boolean,
+        enableAutoValidation? :boolean,            
+        customErrorMessage?: string,            
+        requestMapper?: string,
+        enableAudio?:boolean,
+        enableRefreshImage?:boolean,           
+        enableRTL?:boolean,            
+        mapper?:string,	
+		refreshBegin? :(e:CaptchaEvent):void;
+		refreshSuccess?:(e:CaptchaEvent):void;
+		refreshFailure?:(e:CaptchaEvent):void;
+		refreshComplete?:(e:CaptchaEvent):void;
+    }
+    interface CaptchaEvent  {
+        model: CaptchaOptions;       
+    }
+	interface CaptchaRefreshBegin extends EJ.Core.BaseEvent,CaptchaEvent{
+	data:any;	
+	}
+	interface CaptchaRefreshSuccess extends EJ.Core.BaseEvent,CaptchaEvent{
+	data:any;
+	content: JQuery;
+	}
+	interface CaptchaRefreshFailure extends EJ.Core.BaseEvent,CaptchaEvent{
+	data:any;	
+	}
+	interface CaptchaRefreshComplete extends EJ.Core.BaseEvent,CaptchaEvent{
+	data:any;	
+	}
+ class CheckBox extends EJ.Core.Widget {
         static fn: CheckBox;
         constructor(element: JQuery, options?: CheckBoxOptions);
         constructor(element: Element, options?: CheckBoxOptions);
@@ -498,10 +540,79 @@ declare module ej {
         isChecked: boolean;
         event: JQueryEventObject;
     }
-    //#endregion CheckBox
+class ColorPicker extends EJ.Core.Widget {
+    static fn: ColorPicker;
+    constructor(element: JQuery, options?: ColorPickerOptions);
+    constructor(element: Element, options?: ColorPickerOptions);
+    disable(): void;
+    enable(): void;
+    show(): void;
+    hide(): void;
+    getValue(): string;
+    setValue(): void;
+    getColor(): JQuery;
+    hexCodeToRGB(): JQuery;
+    RGBToHEX(): string;
+    HSVToRGB(): JQuery;
+    RGBToHSV(): JQuery;        
+}
+interface ColorPickerOptions {
+    buttonText?: ColorPickerButtonText;
+    columns?: number;
+    cssClass?: string;
+    custom?: Array<string>;
+    displayInine?: boolean;
+    enableOpacity?: boolean;
+    enabled?: boolean;
+    modelType?: string;
+    opacityValue?: number;
+    palette?: string;
+    presetType?: string;
+    showPreview?: boolean;
+    showRecentColors?: boolean;
+    toolIcon?: string;
+    value?: string;
+    tooltipText?: ColorPickerTooltipText;
+    change? (e: ColorPickerChangeEvent): void;
+    close? (e: ColorPickerEvent): void;
+    create? (e: ColorPickerEvent): void;
+    destroy? (e: ColorPickerEvent): void;
+    open? (e: ColorPickerEvent): void;
+    select? (e: ColorPickerSelectEvent): void;
+}
+interface ColorPickerButtonText {
+    apply?: string;
+    cancel?: string;
+}
+interface ColorPickerTooltipText {
+    addButton?: string;
+    basic?: string;
+    candyCrush?: string;
+    citrus?: string;
+    currentColor?: string;
+    flatColors?: string;
+    misty?: string;
+    monoChrome?: string;
+    moonLight?: string;
+    pinkShades?: string;
+    sandy?: string;
+    seaWolf?: string;
+    selectedColor?: string;
+    switcher?: string;
+    vintage?: string;
+    webColors?: string;
+}
+interface ColorPickerEvent extends EJ.Core.BaseEvent {
+    model: ColorPickerOptions;
+}
+interface ColorPickerChangeEvent extends EJ.Core.BaseEvent, ColorPickerEvent {
+    value?: string;
+}
+interface ColorPickerSelectEvent extends EJ.Core.BaseEvent, ColorPickerEvent {
+    value?: string;
+}
 
-    //#region Datepicker
-    class DatePicker extends EJ.Core.Widget {
+ class DatePicker extends EJ.Core.Widget {
         static fn: DatePicker;
         constructor(element: JQuery, options?: DatePickerOptions);
         constructor(element: Element, options?: DatePickerOptions);
@@ -584,10 +695,7 @@ declare module ej {
     }
 
 
-    //#endregion Datepicker
-
-    //#region DateTimePicker
-    class DateTimePicker extends EJ.Core.Widget {
+ class DateTimePicker extends EJ.Core.Widget {
         static fn: DateTimePicker;
         constructor(element: JQuery, options?: DateTimePickerOptions);
         constructor(element: Element, options?: DateTimePickerOptions);
@@ -654,10 +762,7 @@ declare module ej {
     interface DateTimePickerCloseEvent extends EJ.Core.BaseEvent, DateTimePickerEvent, DateTimePickerOpenEvent {        
     }
 
-    //#endregion DateTimePicker
-
-    //#region Dialog
-    class Dialog extends EJ.Core.Widget {
+ class Dialog extends EJ.Core.Widget {
         static fn: Dialog;
         constructor(element: JQuery, options?: DialogOptions);
         constructor(element: Element, options?: DialogOptions);        
@@ -774,10 +879,7 @@ declare module ej {
     interface DialogCloseEvent extends EJ.Core.BaseEvent, DialogEvent {
         event: Event;
     }
-    //#endregion Dialog
-    
-    //#region DropDownList
-    class DropDownList extends EJ.Core.Widget {
+ class DropDownList extends EJ.Core.Widget {
         static fn: DropDownList;
         constructor(element: JQuery, options?: DropDownListOptions);
         constructor(element: Element, options?: DropDownListOptions);
@@ -875,10 +977,7 @@ declare module ej {
        
     }
 
-    //#endregion DropDownList
-    
-     //#region Editor
-    class NumericTextbox extends EJ.Core.Widget {
+ class NumericTextbox extends EJ.Core.Widget {
         static fn: NumericTextbox;
         constructor(element: JQuery, options?: EditorOptions);
         constructor(element: Element, options?: EditorOptions);
@@ -945,10 +1044,8 @@ declare module ej {
     interface EditorFocusOutEvent extends EJ.Core.BaseEvent, EditorEvent {
         value: number;
     }
-     //#endregion Editor
-
-     //#region MaskEdit
-    class MaskEdit extends EJ.Core.Widget {
+   
+ class MaskEdit extends EJ.Core.Widget {
         static fn: MaskEdit;
         constructor(element: JQuery, options?: MaskEditOptions);
         constructor(element: Element, options?: MaskEditOptions);
@@ -996,10 +1093,7 @@ declare module ej {
         unmaskedValue: string;
     }
   
-    //#endregion MaskEdit
-    
-    //#region Menu
-    class Menu extends EJ.Core.Widget {
+ class Menu extends EJ.Core.Widget {
         static fn: Menu;
         constructor(element: JQuery, options?: MenuOptions);
         constructor(element: Element, options?: MenuOptions);
@@ -1088,11 +1182,7 @@ declare module ej {
         ID: string;
 		selectedItem?: any;
     }
-
-    //#endregion Menu
-
-   //#region Pager
-    class Pager extends EJ.Core.Widget {
+ class Pager extends EJ.Core.Widget {
         static fn: Pager;
         constructor(element: JQuery, options?: PagerOptions);
         constructor(element: Element, options?: PagerOptions);
@@ -1124,10 +1214,7 @@ declare module ej {
     interface PagerClickEvent extends EJ.Core.BaseEvent, PagerEvent{
         currentPage: number;
     }
-   //#endregion Pager
-
-    //#region ProgressBar
-    class ProgressBar extends EJ.Core.Widget {
+ class ProgressBar extends EJ.Core.Widget {
         static fn: ProgressBar;
         constructor(element: JQuery, options?: ProgressBarOptions);
         constructor(element: Element, options?: ProgressBarOptions);
@@ -1170,9 +1257,6 @@ declare module ej {
 
     }
    
-    //#endregion ProgressBar
-
-    //#region RadioButton
     class RadioButton extends EJ.Core.Widget {
         static fn: RadioButton;
         constructor(element: JQuery, options?: RadioButtonOptions);
@@ -1204,10 +1288,7 @@ declare module ej {
         isChecked: boolean;
     }
 
-    //#endregion RadioButton
-
-    //#region Rating
-    class Rating extends EJ.Core.Widget {
+   class Rating extends EJ.Core.Widget {
         static fn: Rating;
         constructor(element: JQuery, options?: RatingOptions);
         constructor(element: Element, options?: RatingOptions);
@@ -1266,11 +1347,7 @@ declare module ej {
         value: number;
         prevValue: number;
     }
-    //#endregion Rating
-
-
-    //#region Rotator
-    class Rotator extends EJ.Core.Widget {
+   class Rotator extends EJ.Core.Widget {
         static fn: Rotator;
         constructor(element: JQuery, options?: RotatorOptions);
         constructor(element: Element, options?: RotatorOptions);
@@ -1353,11 +1430,8 @@ declare module ej {
         activeItemIndex: number;
         itemID?: string;
     }
-    //#endregion Rotator
-
-
-    //#region RTE
-    class RTE extends EJ.Core.Widget {
+ 
+   class RTE extends EJ.Core.Widget {
         static fn: RTE;
         constructor(element: JQuery, options?: RTEOptions);
         constructor(element: Element, options?: RTEOptions);
@@ -1477,10 +1551,8 @@ declare module ej {
     interface RTEResizeEvent extends EJ.Core.BaseEvent, RTEEvent {
         event: Event;
     }
-    //#endregion RTE
-
-    //#region Slider
-    class Slider extends EJ.Core.Widget {
+ 
+   class Slider extends EJ.Core.Widget {
         static fn: Slider;
         constructor(element: JQuery, options?: SliderOptions);
         constructor(element: Element, options?: SliderOptions);
@@ -1540,11 +1612,7 @@ declare module ej {
        
     }
 
-    //#endregion Slider
-
-
-     //#region SplitButton
-    class SplitButton extends EJ.Core.Widget {
+   class SplitButton extends EJ.Core.Widget {
         static fn: SplitButton;
         constructor(element: JQuery, options?: SplitButtonOptions);
         constructor(element: Element, options?: SplitButtonOptions);
@@ -1581,10 +1649,8 @@ declare module ej {
     interface SplitButtonEvent extends EJ.Core.BaseEvent, SplitButtonBaseEvent {
         status: boolean;
     }
-     //#endregion SplitButton
-
-    //#region  Splitter
-    class Splitter extends EJ.Core.Widget {
+ 
+   class Splitter extends EJ.Core.Widget {
         static fn: Splitter;
         constructor(element: JQuery, options?: SplitterOptions);
         constructor(element: Element, options?: SplitterOptions);       
@@ -1628,11 +1694,7 @@ declare module ej {
         expanded: boolean;
         splitbarIndex: number;
     }
-    //#endregion Splitter
-
-
-    //#region Tab
-    class Tab extends EJ.Core.Widget {
+   class Tab extends EJ.Core.Widget {
         static fn: Tab;
         constructor(element: JQuery, options?: TabOptions);
         constructor(element: Element, options?: TabOptions);
@@ -1718,10 +1780,8 @@ declare module ej {
     interface TabAjaxLoadEvent extends EJ.Core.BaseEvent, TabBaseEvent, TabActiveEvent {
         url: string;
     }
-    //#endregion Tab
-
-    //#region TagCloud
-    class TagCloud extends EJ.Core.Widget {
+ 
+   class TagCloud extends EJ.Core.Widget {
         static fn: TagCloud;
         constructor(element: JQuery, options?: TagCloudOptions);
         constructor(element: Element, options?: TagCloudOptions);      
@@ -1768,11 +1828,7 @@ declare module ej {
         eventType: any;
     }
 
-    //#endregion TagCloud
-
-
-    //#region TimePicker
-    class TimePicker extends EJ.Core.Widget {
+   class TimePicker extends EJ.Core.Widget {
         static fn: TimePicker;
         constructor(element: JQuery, options?: TimePickerOptions);
         constructor(element: Element, options?: TimePickerOptions);
@@ -1824,10 +1880,8 @@ declare module ej {
         prevTime: string;
     }
     
-    //#endregion TimePicker
-
-    //#region ToggleButton
-    class ToggleButton extends EJ.Core.Widget {
+ 
+   class ToggleButton extends EJ.Core.Widget {
         static fn: ToggleButton;
         constructor(element: JQuery, options?: ToggleButtonOptions);
         constructor(element: Element, options?: ToggleButtonOptions);
@@ -1872,10 +1926,7 @@ declare module ej {
         isChecked: boolean;        
     }
 
-    //#endregion ToggleButton
-
-    //#region ToolBar
-    class Toolbar extends EJ.Core.Widget {
+   class Toolbar extends EJ.Core.Widget {
         static fn: ToggleButton;
         constructor(element: JQuery, options?: ToolbarOptions);
         constructor(element: Element, options?: ToolbarOptions);
@@ -1933,11 +1984,8 @@ declare module ej {
         target: JQuery;
         status: boolean;
     }   
-    //#endregion ToolBar
-
-
-    //#region TreeView
-    class TreeView extends EJ.Core.Widget {
+ 
+   class TreeView extends EJ.Core.Widget {
         static fn: TreeView;
         constructor(element: JQuery, options?: TreeViewOptions);
         constructor(element: Element, options?: TreeViewOptions);
@@ -2096,11 +2144,8 @@ declare module ej {
         currentElement: Element;
         event: Event;
     }
-    //#endregion TreeView
-
-
-    //#region Uploadbox
-    class Uploadbox extends EJ.Core.Widget {
+ 
+   class Uploadbox extends EJ.Core.Widget {
         static fn: Uploadbox;
         constructor(element: JQuery, options?: UploadboxOptions);
         constructor(element: Element, options?: UploadboxOptions);
@@ -2162,10 +2207,8 @@ declare module ej {
         files: any;
         e: Event;
     }
-    //#endregion Uploadbox
-
-    //#region WaitingPopup
-    class WaitingPopup extends EJ.Core.Widget {
+ 
+   class WaitingPopup extends EJ.Core.Widget {
         static fn: WaitingPopup;
         constructor(element: JQuery, options?: WaitingPopupOptions);
         constructor(element: Element, options?: WaitingPopupOptions);     
@@ -2187,180 +2230,7 @@ declare module ej {
         model: WaitingPopupOptions;
     }
 
-    //#endregion WaitingPopup
-
-     //#region Schedule
-    class Schedule extends EJ.Core.Widget {
-        static fn: Schedule;
-        constructor(element: JQuery, options?: ScheduleOptions);
-        constructor(element: Element, options?: ScheduleOptions);
-        deleteAppointment(id:string): void;
-        saveAppointment(appointment: Object): void;
-        getAppointments(): Array<ScheduleAppointmentSettings>;        
-    }
-    interface ScheduleOptions {
-        timezoneCollection?: Array<ScheduleTimeZone>
-        views?: Array<string>;
-        currentView?: string;
-        timeMode?: string;
-        timeZone?: string;
-        startHour?: number;
-        endHour?: number;
-        highlightBusinessHours?: boolean;
-        showQuickWindow?: boolean;
-        businessStartHour?: boolean;
-        businessEndHour?: boolean;
-        width?: number;
-        height?: number;
-        currentDate?: Date;
-        cssClass?: string;
-        locale?: string;
-        enableResize?: boolean;
-        enableRTL?: boolean;
-        enableAppointmentNavigation?: boolean;
-        appointmentTemplateId?: string;
-        allowDragDrop?: boolean;
-        enableAppointmentResize?: boolean;
-        showCurrentTimeIndicator?: boolean;
-        reminderSettings?: ScheduleRemainderSetting;
-        contextMenuSettings?: ScheduleContextMenuSettings
-        group?: ScheduleGroup;
-        resources?: Array<ScheduleResource>;
-        allowKeyboardNavigation?: boolean;
-        appointmentSettings?: ScheduleAppointmentSettings;
-        cellClick? (e: ScheduleCellClickEvent): void;
-        appointmentClick? (e: ScheduleAppointmentClickEvent): void;
-        cellDoubleClick? (e: ScheduleCellDoubleClickEvent): void;
-        appointmentWindowOpen? (e: ScheduleCellClickEvent): void;
-        appointmentSaved? (e: ScheduleAppointmentSavedEvent): void;
-        appointmentEdited? (e: ScheduleAppointmentEditedEvent): void;
-        appointmentDeleted? (e: ScheduleAppointmentDeletedEvent): void;
-        navigation? (e: ScheduleNavigationEvent): void;
-        dragStart? (e: ScheduleDragStartEvent): void;
-        dragOver? (e: ScheduleDragOverEvent): void;
-        dragDrop? (e: ScheduleDragDropEvent): void;
-        resizeStart? (e: ScheduleResizeStartEvent): void;
-        resizing? (e: ScheduleResizingEvent): void;
-        resizeStop? (e: ScheduleResizeStopEvent): void;
-        menuItemClick? (e: ScheduleMenuItemEvent): void;
-        beforeContextMenuOpen? (e: ScheduleBeforeContextMenuOpenEvent): void;
-        reminder? (e: ScheduleReminderEvent): void;
-        create? (e: ScheduleBaseEvent): void;
-        destroy? (e: ScheduleBaseEvent): void;
-    }
-
-    interface ScheduleTimeZone {
-        text?:string;
-        value?: string;
-    }
-    interface ScheduleRemainderSetting {
-        enable?: boolean;
-        alertBefore?: number;
-    }
-    interface ScheduleContextMenuSettings {
-        enable?: boolean;
-        menuItems?: ScheduleMenuItems;
-    }
-    interface ScheduleMenuItems {
-        appointment?: Array<ScheduleMenuItem>;
-        cells?: Array<ScheduleMenuItem>;
-    }
-    interface ScheduleMenuItem {
-        id?: string;
-        text?: string;
-        parentId?: string;
-    }
-    interface ScheduleGroup {
-        resources?:Array<ScheduleResource>;
-    }
-    interface ScheduleResource {
-        field?: string;
-        title?: string;
-        name?: string;
-        allowMultiple?: boolean;
-        resourceSettings?: SchedulResourceSettings;
-    }
-    interface SchedulResourceSettings {
-        dataSource?: any;
-    }
-    interface ScheduleAppointmentSettings {
-        dataSource?: any;
-        query?: any;
-        tableName?: any;
-        id?: string;
-        subject?: string;
-        description?: string;
-        startTime?: string;
-        endTime?: string;
-        recurrence?: string;
-        recurrenceRule?: string;
-        allDay?: string;
-        resourceFields?: string;
-    }
-    interface ScheduleBaseEvent extends EJ.Core.BaseEvent {
-        model: ScheduleOptions;
-    }
-    interface ScheduleCellClickEvent extends  ScheduleBaseEvent {
-        startTime?: Date;
-        endTime?: any;
-        target?: Event;
-    }
-    interface ScheduleCellDoubleClickEvent extends ScheduleBaseEvent, ScheduleCellClickEvent {      
-    }
-    interface ScheduleAppointmentClickEvent extends ScheduleBaseEvent {
-        appointment?: ScheduleAppointmentSettings;       
-    }
-    
-    interface ScheduleReminderEvent extends ScheduleBaseEvent {
-        reminderAppointment?: number;
-    }
-    interface ScheduleBeforeContextMenuOpenEvent extends ScheduleBaseEvent {  
-        events: any;    
-    }
-    interface ScheduleMenuItemEvent extends ScheduleBaseEvent {
-        events: any;
-    }
-    
-    interface ScheduleNavigationEvent extends ScheduleBaseEvent {
-        prevView: any;
-        currentView: string;
-        Date: Date;
-        target: Event;        
-    }
-    interface ScheduleAppointmentDeletedEvent extends ScheduleBaseEvent {
-        appointment: ScheduleAppointmentSettings;
-    }
-
-    interface ScheduleAppointmentEditedEvent extends ScheduleBaseEvent {
-        appointment: ScheduleAppointmentSettings;
-    }
-    interface ScheduleAppointmentSavedEvent extends ScheduleBaseEvent {
-        appointment: ScheduleAppointmentSettings;
-    }
-    interface ScheduleDragStartEvent extends ScheduleBaseEvent {
-        target: any;
-    }
-    interface ScheduleDragOverEvent extends ScheduleBaseEvent {
-        target: any;
-    }
-    interface ScheduleDragDropEvent extends ScheduleBaseEvent {
-        appointment: any;
-    }
-    interface ScheduleResizeStartEvent extends ScheduleBaseEvent {
-        element: JQuery;
-    }
-
-    interface ScheduleResizingEvent extends ScheduleBaseEvent {
-        element: JQuery;
-    }
-    interface ScheduleResizeStopEvent extends ScheduleBaseEvent {
-        appointment: ScheduleAppointmentSettings;
-        target: Event;
-    }
-     //#endregion Schedule
-
-    //#region Grid
-    class Grid extends EJ.Core.Widget {
+ class Grid extends EJ.Core.Widget {
         static fn: Grid;
         constructor(element: JQuery, options?: GridOptions);
         constructor(element: Element, options?:GridOptions);
@@ -2734,8 +2604,295 @@ declare module ej {
     interface GridBatchEvent extends GridBaseEvent {
         batchChanges: any;
     }
-    //#endregion Grid
-    class Gantt extends EJ.Core.Widget {
+ class PivotGrid extends EJ.Core.Widget {
+        static fn: PivotGrid;
+        element: JQuery;
+        constructor(element: Element, options?: PivotGridOptions);
+        model: Object;
+        validTags: Array<string>;
+        defaults: PivotGridOptions;
+        dataTypes: PivotGridDataTypes;
+        observables: Array<string>;
+        layout(): void;
+        enableCellContext(): void;
+        enableValueCellHyperlink(): void;
+        enableRowHeaderHyperlink(): void;
+        enableColumnHeaderHyperlink(): void;
+        enableSummaryCellHyperlink(): void;
+        locale(): void;
+        getOlapReport(): string;
+        setOlapReport(): void;
+        getJSONRecords(): string;
+        setJSONRecords(): void;
+        exportToExcel(): void;
+        doAjaxPost(): void;
+        doPostBack(): void;
+        refreshPagedOlapGrid(): void;
+        renderControlFromJSON(): void;
+    }
+
+    interface PivotGridOptions {
+        url?: string;
+        cssClass?: string;
+        currentReport?: string;
+	    analysisMode?: string;
+        layout?: string;
+        enablePivotFieldList?:boolean;
+        enableVirtualScrolling?: boolean;
+        enableCellContext?: boolean;
+        enableRTL?: boolean;
+        enableToolTip?:boolean;
+        hyperlinkSettings?: HyperLinkSettings
+        progressMode?: string;
+        serviceMethodSettings?: PivotGridServiceMethods;
+        customObject?: Object;
+        locale?: string;
+        valueCellHyperlinkClick?: string;
+        rowHeaderHyperlinkClick?: string;
+        columnHeaderHyperlinkClick?: string;
+        summaryCellHyperlinkClick?: string;
+        beforeServiceInvoke?: string;
+        afterServiceInvoke?: string;
+        drillSuccess?: string;
+        cellContext?: string;
+        load?: string;
+        renderComplete?: string;
+        renderFailure?: string;
+        renderSuccess?: string;
+    }
+
+    interface HyperLinkSettings {
+        enableValueCellHyperlink?: boolean;
+        enableRowHeaderHyperlink?: boolean;
+        enableColumnHeaderHyperlink?: boolean;
+        enableSummaryCellHyperlink?: boolean;
+    }
+
+    interface PivotGridServiceMethods {
+        initialize?: string;
+        drillDown?: string;
+        exportOptions?: string;
+        paging?: string;
+    }
+
+    interface PivotGridDataTypes {
+        serviceMethodSettings?: Object;
+        customObject?: Object;
+    }
+
+ class PivotSchemaDesigner extends EJ.Core.Widget {
+        static fn: PivotSchemaDesigner;
+        element: JQuery;
+        constructor(element: Element, options?: PivotSchemaDesignerOptions);
+        model: Object;
+        validTags: Array<string>;
+        defaults: PivotSchemaDesignerOptions;
+        dataTypes: PivotSchemaDesignerDataTypes;
+        doAjaxPost(): void;
+    }
+
+    interface PivotSchemaDesignerOptions {
+        url?: string;
+        cssClass?: string;
+        height?: string;
+	width?: string;
+	layout?: string;
+	pivotControl?: Object;
+	pivotTableFields?: Object;
+        pivotCalculations?: Object;
+        pivotColumns? : Object;
+        pivotRows?: Object;
+        serviceMethods?: PivotSchemaDesignerServiceMethods; 
+    }
+    interface PivotSchemaDesignerDataTypes {
+        serviceMethods?: Object;
+        customObject?: Object;
+        pivotControl?: Object;
+        pivotTableFieldList?: Array<string>;
+        pivotCalculationList?: Array<string>;
+        pivotColumnList?:Array<string>;
+        pivotRowList?: Array<string>;
+        filterList?: Array<string>;
+    }
+
+    interface PivotSchemaDesignerServiceMethods {
+      
+        fetchMembers?: string;
+        nodeStateModified?: string;
+        nodeDropped?: string;
+        removeButton?: string;
+        memberExpand?: string;
+        filtering?: string;
+}
+   class Schedule extends EJ.Core.Widget {
+        static fn: Schedule;
+        constructor(element: JQuery, options?: ScheduleOptions);
+        constructor(element: Element, options?: ScheduleOptions);
+        deleteAppointment(id:string): void;
+        saveAppointment(appointment: Object): void;
+        getAppointments(): Array<ScheduleAppointmentSettings>;        
+    }
+    interface ScheduleOptions {
+        timezoneCollection?: Array<ScheduleTimeZone>
+        views?: Array<string>;
+        currentView?: string;
+        timeMode?: string;
+        timeZone?: string;
+        startHour?: number;
+        endHour?: number;
+        highlightBusinessHours?: boolean;
+        showQuickWindow?: boolean;
+        businessStartHour?: boolean;
+        businessEndHour?: boolean;
+        width?: number;
+        height?: number;
+        currentDate?: Date;
+        cssClass?: string;
+        locale?: string;
+        enableResize?: boolean;
+        enableRTL?: boolean;
+        enableAppointmentNavigation?: boolean;
+        appointmentTemplateId?: string;
+        allowDragDrop?: boolean;
+        enableAppointmentResize?: boolean;
+        showCurrentTimeIndicator?: boolean;
+        reminderSettings?: ScheduleRemainderSetting;
+        contextMenuSettings?: ScheduleContextMenuSettings
+        group?: ScheduleGroup;
+        resources?: Array<ScheduleResource>;
+        allowKeyboardNavigation?: boolean;
+        appointmentSettings?: ScheduleAppointmentSettings;
+        cellClick? (e: ScheduleCellClickEvent): void;
+        appointmentClick? (e: ScheduleAppointmentClickEvent): void;
+        cellDoubleClick? (e: ScheduleCellDoubleClickEvent): void;
+        appointmentWindowOpen? (e: ScheduleCellClickEvent): void;
+        appointmentSaved? (e: ScheduleAppointmentSavedEvent): void;
+        appointmentEdited? (e: ScheduleAppointmentEditedEvent): void;
+        appointmentDeleted? (e: ScheduleAppointmentDeletedEvent): void;
+        navigation? (e: ScheduleNavigationEvent): void;
+        dragStart? (e: ScheduleDragStartEvent): void;
+        dragOver? (e: ScheduleDragOverEvent): void;
+        dragDrop? (e: ScheduleDragDropEvent): void;
+        resizeStart? (e: ScheduleResizeStartEvent): void;
+        resizing? (e: ScheduleResizingEvent): void;
+        resizeStop? (e: ScheduleResizeStopEvent): void;
+        menuItemClick? (e: ScheduleMenuItemEvent): void;
+        beforeContextMenuOpen? (e: ScheduleBeforeContextMenuOpenEvent): void;
+        reminder? (e: ScheduleReminderEvent): void;
+        create? (e: ScheduleBaseEvent): void;
+        destroy? (e: ScheduleBaseEvent): void;
+    }
+
+    interface ScheduleTimeZone {
+        text?:string;
+        value?: string;
+    }
+    interface ScheduleRemainderSetting {
+        enable?: boolean;
+        alertBefore?: number;
+    }
+    interface ScheduleContextMenuSettings {
+        enable?: boolean;
+        menuItems?: ScheduleMenuItems;
+    }
+    interface ScheduleMenuItems {
+        appointment?: Array<ScheduleMenuItem>;
+        cells?: Array<ScheduleMenuItem>;
+    }
+    interface ScheduleMenuItem {
+        id?: string;
+        text?: string;
+        parentId?: string;
+    }
+    interface ScheduleGroup {
+        resources?:Array<ScheduleResource>;
+    }
+    interface ScheduleResource {
+        field?: string;
+        title?: string;
+        name?: string;
+        allowMultiple?: boolean;
+        resourceSettings?: SchedulResourceSettings;
+    }
+    interface SchedulResourceSettings {
+        dataSource?: any;
+    }
+    interface ScheduleAppointmentSettings {
+        dataSource?: any;
+        query?: any;
+        tableName?: any;
+        id?: string;
+        subject?: string;
+        description?: string;
+        startTime?: string;
+        endTime?: string;
+        recurrence?: string;
+        recurrenceRule?: string;
+        allDay?: string;
+        resourceFields?: string;
+    }
+    interface ScheduleBaseEvent extends EJ.Core.BaseEvent {
+        model: ScheduleOptions;
+    }
+    interface ScheduleCellClickEvent extends  ScheduleBaseEvent {
+        startTime?: Date;
+        endTime?: any;
+        target?: Event;
+    }
+    interface ScheduleCellDoubleClickEvent extends ScheduleBaseEvent, ScheduleCellClickEvent {      
+    }
+    interface ScheduleAppointmentClickEvent extends ScheduleBaseEvent {
+        appointment?: ScheduleAppointmentSettings;       
+    }
+    
+    interface ScheduleReminderEvent extends ScheduleBaseEvent {
+        reminderAppointment?: number;
+    }
+    interface ScheduleBeforeContextMenuOpenEvent extends ScheduleBaseEvent {  
+        events: any;    
+    }
+    interface ScheduleMenuItemEvent extends ScheduleBaseEvent {
+        events: any;
+    }
+    
+    interface ScheduleNavigationEvent extends ScheduleBaseEvent {
+        prevView: any;
+        currentView: string;
+        Date: Date;
+        target: Event;        
+    }
+    interface ScheduleAppointmentDeletedEvent extends ScheduleBaseEvent {
+        appointment: ScheduleAppointmentSettings;
+    }
+
+    interface ScheduleAppointmentEditedEvent extends ScheduleBaseEvent {
+        appointment: ScheduleAppointmentSettings;
+    }
+    interface ScheduleAppointmentSavedEvent extends ScheduleBaseEvent {
+        appointment: ScheduleAppointmentSettings;
+    }
+    interface ScheduleDragStartEvent extends ScheduleBaseEvent {
+        target: any;
+    }
+    interface ScheduleDragOverEvent extends ScheduleBaseEvent {
+        target: any;
+    }
+    interface ScheduleDragDropEvent extends ScheduleBaseEvent {
+        appointment: any;
+    }
+    interface ScheduleResizeStartEvent extends ScheduleBaseEvent {
+        element: JQuery;
+    }
+
+    interface ScheduleResizingEvent extends ScheduleBaseEvent {
+        element: JQuery;
+    }
+    interface ScheduleResizeStopEvent extends ScheduleBaseEvent {
+        appointment: ScheduleAppointmentSettings;
+        target: Event;
+    }
+ 
+ class Gantt extends EJ.Core.Widget {
         static fn: Gantt;
         constructor(element: JQuery, options?: GanttOptions);
         defaults: GanttOptions;
@@ -2770,7 +2927,10 @@ declare module ej {
         includeWeekend?: boolean;
         toolbarSettings?: { showToolbar?: boolean; toolbarItems?: Array<any> };
         stripLines?: Array<any>;
-        scheduleHeaderSettings?: { weekHeaderFormat?: string; dayHeaderFormat?: string; weekendBackground?: string };
+        scheduleHeaderSettings?: { weekHeaderFormat?: string; dayHeaderFormat?: string; yearHeaderFormat?: string; monthHeaderFormat?: string; hourHeaderFormat?: string; scheduleHeaderType?: string; weekendBackground?: string };
+        workingTimeScale?: string;
+        roundOffDayworkingTime?: boolean;
+        durationUnit?: string;
         taskbarBackground?: string;
         progressbarBackground?: string;
         connectorLineBackground?: string;
@@ -2813,7 +2973,7 @@ declare module ej {
         renderBaseline?: boolean;
         enableContextMenu?: boolean;
         treeColumnIndex?: number;
-		editDialogFields:Array<any>;
+		editDialogFields?:Array<any>;
         rowSelecting? (e: GanttEvent): void;
         rowSelected? (e: GanttEvent): void;
         queryCellInfo? (e: GanttEvent): void;
@@ -2839,7 +2999,115 @@ declare module ej {
         model: GanttOptions;
     }
 
-    class TreeGrid extends EJ.Core.Widget {
+    class ReportViewer extends EJ.Core.Widget {
+        static fn: ReportViewer;
+        element: JQuery;
+        constructor(element: Element, options?: ReportViewerOptions);
+        model: Object;
+        defaults: ReportViewerOptions;
+        disable(): void;
+        enable(): void;
+        destroy(): void;
+    }
+
+    interface ReportViewerOptions {
+        reportServiceUrl?: string;
+        reportPath?: string;
+        reportServerUrl?: string;
+        dataSources?: Array<Object>;
+        parameters?: Array<Object>;
+		toolbarSettings?: ReportViewerToolbarOptions;
+        exportSettings?: ReportViewerExportOptions;        
+		locale?: string;
+		printMode?: boolean;        
+        processingMode?: ReportProcessingMode;
+		zoomFactor?: string;
+        reportLoaded? (e: ReportViewerEvent): void;
+        renderingBegin? (e: ReportViewerEvent): void;
+        renderingComplete? (e: ReportViewerEvent): void;
+        reportError? (e: ReportViewerEvent): void;
+        drillThrough? (e: ReportViewerEvent): void;
+    }
+
+    interface ReportViewerToolbarOptions {
+        items?: ItemOptions;
+        showToolbar?: boolean;
+		templateId?: string;
+		click? (e: ReportViewerToolbarEvent): void;
+		showTooltip?: boolean;
+    }
+	
+	interface ReportViewerExportOptions {
+        exportOptions?: ExportOptions;	
+		excelFormat?: ExcelFormatOptions;
+		wordFormat?: WordFormatOptions;
+    }
+
+    enum ExportOptions {
+        Excel,
+        Html,
+        Pdf,
+        Word,
+        All
+    }
+	
+    enum ItemOptions {
+        Export,
+        Zoom,
+        PageNavigation,
+        Refresh,
+        Print,
+        DocumentMap,
+        Parameters,
+		PrintLayout,
+        All
+    }
+
+    enum ReportProcessingMode {
+        Remote,
+        Local
+    }
+	
+	enum ExcelFormatOptions{
+        Excel97to2003,
+        Excel2007,
+        Excel2010,
+        Excel2013        
+	}
+	
+	enum WordFormatOptions{
+	    Doc,
+	    Dot,
+	    Docx,
+	    Word2007,
+	    Word2010,
+	    Word2013,
+	    Word2007Dotx,
+	    Word2010Dotx,
+	    Word2013Dotx,
+	    Word2007Docm,
+	    Word2010Docm,
+	    Word2013Docm,
+	    Word2007Dotm,
+	    Word2010Dotm,
+	    Word2013Dotm,
+	    Rtf,
+	    Txt,
+	    EPub,
+	    Html,
+	    Xml,
+	    Automatic	
+	}
+
+    interface ReportViewerEvent extends EJ.Core.BaseEvent{
+        model: ReportViewerOptions;
+    }	
+	
+	interface ReportViewerToolbarEvent extends EJ.Core.BaseEvent{
+        model: ReportViewerOptions;
+    }
+
+ class TreeGrid extends EJ.Core.Widget {
         static fn: TreeGrid;
         constructor(element: JQuery, options?: TreeGridOptions);
         defaults: TreeGridOptions;
@@ -2897,6 +3165,8 @@ declare module ej {
         showGridExpandCellTooltip?: boolean;
         rowDataBound? (e: TreeGridEvent): void;
         queryCellInfo? (e: TreeGridEvent): void;
+        rowTemplateID?: string;
+        altRowTemplateID?: string;
     }
 
     interface TreeGridEvent {
@@ -2904,12 +3174,136 @@ declare module ej {
         type: string;
         model: TreeGridOptions;
     }
-        
+class NavigationDrawer extends EJ.Core.Widget {
+    static fn: NavigationDrawer;
+    element: JQuery;
+    constructor(element: JQuery, options?: NavigationDrawerOptions);
+    model: Object;
+    defaults: NavigationDrawerOptions;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+//ejNavigationDrawer Option
+interface NavigationDrawerOptions {
+    allowScrolling?: boolean;
+    direction?: string;
+    showScrollbars?: boolean;
+    targetId?: string;
+    position?: string;
+    enableListView?: boolean;
+    listViewSettings?: {};
+    type?: string;
+    width?: string;
+    swipe? (e: NavigationDrawerSwipeEventArgs): void;
+    open? (e: NavigationDrawerOpenBeforeCloseEventArgs): void;
+    beforeClose? (e: NavigationDrawerOpenBeforeCloseEventArgs): void;
 }
 
-declare module ej.olap {
+//ejNavigationDrawer Swipe Event Arugument
+interface NavigationDrawerSwipeEventArgs {
+    type: string;
+    cancel: boolean;
+    element: Object;
+    model: Object;
+    targetElement: Object;
+    direction: string;
+}
+//ejNavigationDrawer Open and BeforeClose Event Arugument
+interface NavigationDrawerOpenBeforeCloseEventArgs {
+    type: string;
+    cancel: boolean;
+    element: Object;
+    model: Object;
+}
 
-    class OlapChart extends EJ.Core.Widget {
+class RadialMenu extends EJ.Core.Widget {
+    static fn: RadialMenu;
+    element: JQuery;
+    constructor(element: JQuery, options?: RadialMenuOptions);
+    model: Object;
+    defaults: RadialMenuOptions;
+    getTitle(): string;
+}
+
+interface RadialMenuOptions {
+    width?: number;
+    imageURL?: string;
+    backImageURL?: string;
+    click? (e: RadialMenuClickEventArgs): void;
+}
+
+interface RadialMenuClickEventArgs {
+    index: number;
+    childIndex: number;
+    model: Object;
+    type: string;
+    element: Object;
+    text: string;
+}
+
+
+    class Tile extends EJ.Core.Widget {
+        static fn: Tile;
+        element: JQuery;
+        constructor(element: JQuery, options?: TileOptions);
+        constructor(element: Element, options?: TileOptions);
+        destroy(): void;
+        updateTemplate(string, number): void;
+    }
+
+    interface TileOptions {
+        badge?: tileBadgeOptions;
+        captionTemplateId?: string;
+		enablePersistence?: boolean;
+        imageClass?: string;
+        imagePosition?: string;
+        imageTemplateId?: string;
+        imageUrl?: string;
+		liveTile?: liveTileOptions;
+        showText?: boolean;
+        text?: string;
+        textAlignment?: string;
+		theme?: string;
+        tileSize?: string;
+        mouseUp? (e: tileMouseUpEventArgs): void;
+        mouseDown? (e: tileMouseDownEventArgs): void;
+    }
+
+    interface tileBadgeOptions {
+        enabled?: boolean;
+        value?: number;
+        maxValue?: number;
+        minValue?: number;
+		text?: string;
+    }
+
+	interface liveTileOptions {
+        enabled?: boolean;
+        imageClass?: string;
+		imageTemplateId?: string;
+		imageUrl?: string[];
+		type?: string;
+		updateInterval?: number;
+    }
+	
+    interface tileMouseUpEventArgs {
+        cancel: boolean;
+        model: TileOptions;
+        type: string;
+        text: string;
+    }
+
+    interface tileMouseDownEventArgs {
+        cancel: boolean;
+        model: TileOptions;
+        type: string;
+        text: string;
+    }
+}
+declare module ej.olap {
+	
+ class OlapChart extends EJ.Core.Widget {
         static fn: OlapChart;
         element: JQuery;
         constructor(element: Element, options?: OlapChartOptions);
@@ -2965,8 +3359,7 @@ declare module ej.olap {
         type: string;
         model: OlapChartOptions;
     }
-
-    class OlapGrid extends EJ.Core.Widget {
+ class OlapGrid extends EJ.Core.Widget {
         static fn: OlapGrid;
         element: JQuery;
         constructor(element: Element, options?: OlapGridOptions);
@@ -2997,10 +3390,12 @@ declare module ej.olap {
         url?: string;
         cssClass?: string;
         currentReport?: string;
+	    analysisMode?: string;
         layout?: string;
         enableVirtualScrolling?: boolean;
         enableCellContext?: boolean;
         enableRTL?: boolean;
+        enableToolTip?:boolean;
         hyperlinkSettings?: HyperLinkSettings
         progressMode?: string;
         serviceMethodSettings?: OlapGridServiceMethods;
@@ -3039,7 +3434,7 @@ declare module ej.olap {
         customObject?: Object;
     }
 
-    class OlapClient extends EJ.Core.Widget {
+ class OlapClient extends EJ.Core.Widget {
         static fn: OlapClient;
         element: JQuery;
         constructor(element: Element, options?: OlapClientOptions);
@@ -3199,11 +3594,9 @@ declare module ej.olap {
     }
 
 }
-
-
-/*Mobile Core - Start*/
-declare module ej.mobile.core {    
-    class MobUtil extends EJ.Core.Widget {
+declare module ej.mobile.core {
+	
+class MobUtil extends EJ.Core.Widget {
         static fn: MobUtil;
         element: JQuery;
         getMaxZindex(): number;
@@ -3267,11 +3660,9 @@ declare module ej.mobile.core {
         browserDetect?: Object;
     }
 }
-/*Mobile Core - End*/
-
-/*Mobile Appview - Start*/
 declare module App {
-    var addMetaTags: boolean;
+	
+var addMetaTags: boolean;
     var allowPopState: boolean;
     var allowPushState: boolean;
     var activePage: Object;
@@ -3308,17 +3699,14 @@ declare module App {
         splitUrl(url: string): any;
     }
 }
-/*Mobile Appview - End*/
-
-/*Mobile Controls - Start*/
 declare module ej.mobile {
-    //Global Interface
+	
+ //Global Interface
     interface windowsOption {
         renderDefault?: boolean;
     }
 
-    /*Accordion - Start*/
-    class Accordion extends EJ.Core.Widget {
+ class Accordion extends EJ.Core.Widget {
         static fn: Accordion;
         constructor(element: JQuery, options?: AccordionOptions);
         model: Object;
@@ -3383,10 +3771,7 @@ declare module ej.mobile {
     interface AccordionBeforeActiveEventArgs extends AccordionEventArgs{
         activeItemIndex?: number;
     }
-    /*Accordion - End*/
-
-    /*Autocomplete - Start*/
-    class Autocomplete extends EJ.Core.Widget {
+ class Autocomplete extends EJ.Core.Widget {
         static fn: Autocomplete;
         element: JQuery;
         constructor(element: JQuery, options?: AutocompleteOptions);
@@ -3463,11 +3848,8 @@ declare module ej.mobile {
     }
     interface AutocompleteFocusOutEventArgs extends AutocompleteEventArgs{
         value: string;
-    }   
-    /*Autocomplete - End*/
-
-    /*Button - Start*/
-    class Button extends EJ.Core.Widget {
+    }
+ class Button extends EJ.Core.Widget {
         static fn: Button;
         element: JQuery;
         constructor(element: JQuery, options?: ButtonOptions);
@@ -3519,12 +3901,7 @@ declare module ej.mobile {
     interface flatButtonOption {
         style?: string;
     }
-   
-    /*Button - End*/
-
-    /*DatePicker*/
-    //Class DatePicker
-    class DatePicker extends EJ.Core.Widget {
+ class DatePicker extends EJ.Core.Widget {
         static fn: DatePicker;
         element: JQuery;
         constructor(element: JQuery, options?: DatePickerOptions);
@@ -3532,3862 +3909,4 @@ declare module ej.mobile {
         defaults: DatePicker;
         destroy(): void;
         disable(): void;
-        enable(): void;
-        hide(): void;
-        show(): void;
-    }
-
-    //ejmDatePicker Options
-    interface DatePickerOptions {
-        renderMode?: string;
-        theme?: string;
-        culture?: string;
-        dateFormat?: string;
-        defaultDate?: string;
-        enabled?: boolean;
-        ios7?: ios7Option;
-        windows?: windowsOption;
-        maxDate?: string;
-        minDate?: string;
-        load? (e: DatePickerEventArgs): void;
-        select? (e: DatePickerEventArgs): void;
-        focusIn? (e: DatePickerEventArgs): void;
-        focusOut? (e: DatePickerEventArgs): void;
-        open? (e: DatePickerEventArgs): void;
-        close? (e: DatePickerEventArgs): void;
-        change? (e: DatePickerEventArgs): void;
-    }
-    //ejmDatePickerEvent Arugument
-    interface DatePickerEventArgs {
-        cancel?: boolean;
-        type?: string;
-        model?: DatePickerOptions;
-        value?: string;
-    }
-
-    interface ios7Option {
-        renderDefault: boolean;
-    }
-
-    /*DatePicker - END*/
-
-    /*Editor-Start*/
-    class Numeric extends EJ.Core.Widget {
-        static fn: Numeric;
-        element: JQuery;
-        constructor(element: JQuery, options?: EditorOptions);
-        model: Object;
-        ValidTags: Array<string>;
-        defaults: EditorOptions;
-        disable(): void;
-        enable(): void;
-        getValue(): void;
-        setValue(number): void;
-    }
-
-    interface EditorOptions {
-        allowStrictMode?: boolean;
-        enabled?: boolean;
-        showBorder?: boolean;
-        enableSpinButton?: boolean;
-        incrementStep?: number;
-        maxValue?: number;
-        minValue?: number;
-        name?: string;
-        persist?: boolean;
-        readOnly?: boolean;
-        renderMode?: string;
-        setDecimals?: number;
-        theme?: string;
-        value?: number;
-        watermarkText?: string;
-        change? (e: EditorEventArgs): void;
-        windows?: windowsOption;
-    }
-
-    interface EditorEventArgs {
-        cancel: boolean;
-        type: string;
-        model: EditorOptions;
-        value: number;
-        element: Object;
-    }
-    /*Editor-End*/
-
-    /* Grid Start*/
-
-    class Grid extends EJ.Core.Widget {
-        static fn: Grid;
-        element: JQuery;
-        constructor(element: JQuery, options?: GridOptions);
-        model: Object;
-        validTags: Array<string>;
-        defaults: GridOptions;
-        disable(): void;
-        enable(): void;
-        destroy(): void;
-        getColumnByField(string): void;
-        getColumnByHeaderText(string): void;
-        getColumnByIndex(number): void;
-        getColumnFieldNames(): void;
-        getColumnIndexByField(string): void;
-        getColumnMemberByIndex(number): void;
-        hideColumns(string): void;
-        refreshContent(string): void;
-        showColumns(string): void;
-    }
-    interface GridOptions {
-        cssClass?: string;
-        allowPaging?: boolean;
-        allowSorting?: boolean;
-        allowFiltering?: boolean;
-        allowScrolling?: boolean;
-        allowSelection?: boolean;
-        dataSource: any;
-        caption?: string;
-        persist?: boolean;
-        selectedRow?: number;
-        showCaption?: boolean;
-        allowColumnSelector?: boolean;
-        transition?: string;
-        columns?: Array<Object>;
-        rowSelecting? (e: GridEventArgs): void;
-        rowSelected? (e: GridEventArgs): void;
-        actionBegin? (e: GridEventArgs): void;
-        actionComplete? (e: GridEventArgs): void;
-        actionSuccess? (e: GridEventArgs): void;
-        actionFailure? (e: GridEventArgs): void;
-        queryCellInfo? (e: GridEventArgs): void;
-        rowDataBound? (e: GridEventArgs): void;
-        modelChange? (e: GridEventArgs): void;
-        load? (e: GridEventArgs): void;
-        pageSettings?: PageSettings;
-        scrollSettings?: ScrollSettings;
-        sortSettings?: SortSettings;
-        filterSettings?: FilterSettings;
-    }
-
-    interface PageSettings {
-        pageSize?: number;
-        currentPage?: number;
-        display?: string;
-        type?: string;
-        totalRecordsCount?: number;
-    }
-    interface ScrollSettings {
-        enableColumnScrolling?: boolean;
-        height?: string;
-        width?: string;
-        enableRowScrolling?: boolean;
-        enableNativeScrolling?: boolean;
-    }
-    interface SortSettings {
-        allowMultiSorting?: boolean;
-        sortedColumns?: Array<any>;
-    }
-    interface FilterSettings {
-        isCaseSensitive?: boolean;
-        filterBarMode?: string;
-        interval?: number;
-        filteredColumns?: Array<any>;
-    }
-
-    //ejmGridEvent Arugument
-    interface GridEventArgs {
-        cancel: boolean;
-        type: string;
-        model: GridOptions;
-    }
-
-   
-    /* Grid End */
-
-    /*Header*/
-    class Header extends EJ.Core.Widget {
-        static fn: Header;
-        element: JQuery;
-        constructor(element: JQuery, options?: HeaderOptions);
-        model: Object;
-        defaults: HeaderOptions;
-        getTitle(): string;
-    }
-
-    interface HeaderOptions {
-        hideForUnSupportedDevice?: boolean;
-        leftButtonNavigationUrl?: string;
-        rightButtonNavigationUrl?: string;
-        title?: string;
-        showTitle?: boolean;
-        position?: string;
-        leftButtonCaption?: string;
-        rightButtonCaption?: string;
-        leftButtonStyle?: string;
-        rightButtonStyle?: string;
-        renderMode?: string;
-        theme?: string;
-        showLeftButton?: boolean;
-        showRightButton?: boolean;
-        windows?: HeaderWindowsOptions;
-        android?: HeaderAndroidOptions;
-        leftButtonTap? (e: HeaderLeftButtonTapEventArgs): void;
-        rightButtonTap? (e: HeaderRightButtonTapEventArgs): void;
-    }
-    interface HeaderWindowsOptions extends windowsOption {
-        enableCustomText?: boolean;
-        renderDefault?: boolean;
-    }
-    interface HeaderAndroidOptions {
-        backButtonImageClass?: string;
-    }
-    interface HeaderLeftButtonTapEventArgs {
-        text: string;
-        cancel: boolean;
-        model: Object;
-        type: string;
-        status: boolean;
-    }
-    interface HeaderRightButtonTapEventArgs {
-        text: string;
-        cancel: boolean;
-        model: Object;
-        type: string;
-        status: boolean;
-    }
-    /*Header*/
-
-
-    /* ListBox - Start*/
-    interface ajaxSettingsOptions {
-        type?: string;
-        cache?: boolean;
-        async?: boolean;
-        dataType?: string;
-        contentType?: string;
-        url?: string;
-        data?: Array<any>;
-    }
-    //Class ejmListbox
-    class Listbox extends EJ.Core.Widget {
-        static fn: Listbox;
-        element: JQuery;
-        constructor(element: JQuery, options?: ListboxOptions);
-        model: Object;
-        defaults: ListboxOptions;
-        addItem(object, number): void;
-        checkAllItem(): void;
-        checkItem(number): void;
-        deActive(number): void;
-        disableItem(number): void;
-        enableItem(number): void;
-        getActiveItem(): void;
-        getActiveItemText(): void;
-        getCheckedItems(): void;
-        getCheckedItemsText(): void;
-        getItemsCount(): void;
-        getItemText(number): void;
-        hasChild(number): boolean;
-        hide(): void;
-        hideItem(number): void;
-        isChecked(number): boolean;
-        loadAjaxContent(): void;
-        removeCheckMark(number): void;
-        removeItem(number): void;
-        selectItem(number): void;
-        setActive(number): void;
-        show(): void;
-        showItem(number): void;
-        unCheckAllItem(): void;
-        unCheckItem(number): void;
-    }
-    //ejmListbox IOS7Option
-    interface Ios7Option {
-        inline?: boolean;
-    }
-    //ejmListbox IOS7Option
-    interface windowsListboxOption extends windowsOption {
-        preventSkew?: boolean;
-    }
-
-    //ejmListbox Option
-    interface ListboxOptions {
-        theme?: string;
-        renderMode?: string;
-        ios7?: Ios7Option;
-        windows?: windowsListboxOption;
-        adjustFixedPosition?: boolean;
-        ajaxSettings?: ajaxSettingsOptions;
-        allowCache?: boolean;
-        allowScrolling?: boolean;
-        checkDOMChanges?: boolean;
-        dataBinding?: boolean;
-        dataSource?: any;
-        enableAjax?: boolean;
-        enableCheckMark?: boolean;
-        enableFiltering?: boolean;
-        showHeader?: boolean;
-        showHeaderBackButton?: boolean;
-        enableNativeScrolling?: boolean;
-        showScrollbars?: boolean;
-        fieldSettings?: Object;
-        enableGroupList?: boolean;
-        headerBackButtonText?: string;
-        hideHeaderForUnSupportedDevice?: boolean;
-        headerTitle?: string;
-        height?: number;
-        persistSelection?: boolean;
-        preventSelection?: boolean;
-        query?: string;
-        renderTemplate?: boolean;
-        selectedItemIndex?: number;
-        autoAdjustHeight?: boolean;
-        autoAdjustScrollHeight?: boolean;
-        templateId?: any;
-        transition?: string;
-        width?: number;
-        ajaxBeforeSend? (e: ListboxEventArgs): void;
-        ajaxLoadComplete? (e: ListboxEventArgs): void;
-        ajaxLoadError? (e: ListboxEventArgs): void;
-        ajaxLoadSuccess? (e: ListboxEventArgs): void;
-        headerBackButtonTap? (e: ListboxEventArgs): void;
-        load? (e: ListboxEventArgs): void;
-        loadComplete? (e: ListboxEventArgs): void;
-        touchEnd? (e: ListboxEventArgs): void;
-        touchStart? (e: ListboxEventArgs): void;
-
-    }
-    //ejmListboxEvent Arugument
-    interface ListboxEventArgs {
-        cancel: boolean;
-        type: string;
-        model: ListboxOptions;
-        ajaxData: Object;
-        data: Object;
-        errorData: Object;
-        successData: Object;
-        text: string;
-        element: Object;
-        id: string;
-        hasChild: boolean;
-        currentItem: string;
-        currentText: string;
-        currentItemIndex: number;
-        isChecked: boolean;
-        checkedItems: number;
-        checkedItemsText: string;
-    }
-    /* ListBox - End*/
-
-
-    /*Menu*/
-    //Class ejmMenu
-    class Menu extends EJ.Core.Widget {
-        static fn: Menu;
-        element: JQuery;
-        constructor(element: JQuery, options?: MenuOptions);
-        model: Object;
-        defaults: MenuOptions;
-        addItem(element, number): void;
-        disable(): void;
-        disableItem(number): void;
-        disableOverFlow(): void;
-        disableOverFlowItem(number): void;
-        disableShowOn(): void;
-        enable(): void;
-        enableItem(number): void;
-        enableOverFlow(): void;
-        enableOverFlowItem(number): void;
-        enableShowOn(): void;
-        hide(): void;
-        removeItem(number): void;
-        show(): void;
-    }
-    //ejmMenu Option
-    interface MenuOptions {
-        theme?: string;
-        renderMode?: string;
-        allowScrolling?: boolean;
-        showScrollbars?: boolean;
-        height?: number;
-        renderTemplate?: boolean;
-        showOn?: string;
-        targetId: string;
-        templateId?: string;
-        width?: number;
-        android?: AndroidOptions;
-        ios7?: Ios7Options;
-        windows?: windowsOption;
-        cancelButtonTouchEnd? (e: MenuCancelButtonTouchEndEventArgs): void;
-        hide? (e: MenuShowHideEventArgs): void;
-        load? (e: MenuLoadEventArgs): void;
-        loadComplete? (e: MenuLoadCompleteEventArgs): void;
-        show? (e: MenuShowHideEventArgs): void;
-        touchStart? (e: MenuTouchEventArgs): void;
-        touchEnd? (e: MenuTouchEventArgs): void;
-    }
-    //ejmMenu IOS7 Option
-    interface Ios7Options {
-        cancelButtonColor?: string;
-        cancelButtonText?: string;
-        type?: string;
-        title?: string;
-        enableTitle?: boolean;
-        showCancelButton?: boolean;
-
-    }
-
-    //ejmMenu Android Option
-    interface AndroidOptions {
-        menuType?: string;
-
-    }
-    //ejmMenu Event Arugument
-    interface MenuTouchEventArgs {
-        cancel: boolean;
-        type: string;
-        element: Object;
-        text: string;
-    }
-    interface MenuCancelButtonTouchEndEventArgs {
-        cancel: boolean;
-        type: string;
-        element: Object;
-        text: string;
-    }
-    interface MenuLoadEventArgs {
-        cancel: boolean;
-        type: string;
-    }
-    interface MenuLoadCompleteEventArgs {
-        cancel: boolean;
-        type: string;
-        element: Object;
-        id: string;
-    }
-    interface MenuShowHideEventArgs {
-        cancel: boolean;
-        type: string;
-    }
-    
-    /*Menu*/
-
-    /*ProgressBar start*/
-    //Class ejmProgress
-    class Progress extends EJ.Core.Widget {
-        static fn: Progress;
-        element: JQuery;
-        constructor(element: JQuery, options?: ProgressOptions);
-        model: Object;
-        defaults: ProgressOptions;
-        getValue(): void;
-        getPercentage(): void;
-    }
-
-    //ejmProgressbar Option
-    interface ProgressOptions {
-        theme?: string;
-        renderMode?: string;
-        enableCustomText?: boolean;
-        enabled?: boolean;
-        height?: number;
-        incrementStep?: number;
-        maxValue?: number;
-        minValue?: number;
-        orientation?: string;
-        percentage?: number;
-        enablePersistence?: boolean;
-        text?: string;
-        value?: number;
-        width?: number;
-        change? (e: ProgressEventArgs): void;
-        complete? (e: ProgressEventArgs): void;
-        start? (e: ProgressEventArgs): void;
-    }
-    //ejmProgressbarEvent Arugument
-    interface ProgressEventArgs {
-        cancel: boolean;
-        type: string;
-        model: ProgressOptions;
-        value: number;
-    }
-
-    /*ProgressBar - END*/
-
-    /*Radio Button*/
-    //Class ejmRadioButton
-    class RadioButton extends EJ.Core.Widget {
-        static fn: RadioButton;
-        element: JQuery;
-        constructor(element: JQuery, options?: RadioButtonOptions);
-        model: Object;
-        defaults: RadioButtonOptions;
-        destroy(): void;
-        enable(): void;
-        disable(): void;
-    }
-
-    //ejmRadioButton Options
-    interface RadioButtonOptions {
-        renderMode?: string;
-        theme?: string;
-        checked?: boolean;
-        text?: string;
-        enabled?: boolean;
-        touchStart? (e: RadioButtonEventArgs): void;
-        touchEnd? (e: RadioButtonEventArgs): void;
-        change? (e: RadioButtonEventArgs): void;
-    }
-    //ejmRadioButtonEvent Arugument
-    interface RadioButtonEventArgs {
-        model: RadioButtonOptions;
-        value: boolean;
-        isChecked: boolean;
-        type: string;
-    }
-    /*RadioButton - END*/
-
-
-    /*Rating*/
-    class Rating extends EJ.Core.Widget {
-        static fn: Rating;
-        element: JQuery;
-        constructor(element?: JQuery, options?: RatingOptions);
-        model: Object;
-        defaults: RatingOptions;
-        show(): void;
-        hide(): void;
-        getValue(): void
-        reset(): void;
-        setValue(number): void;
-    }
-
-    interface RatingOptions {
-        maxValue?: number;
-        minValue?: number;
-        value?: number;
-        incrementStep?: number;
-        precision?: string;
-        enabled?: boolean;
-        theme?: string;
-        renderMode?: string;
-        shape?: string;
-        shapeWidth?: number;
-        shapeHeight?: number;
-        spaceBetweenShapes?: number;
-        orientation?: string;
-        readOnly?: boolean;
-        enablePersistence?: boolean;
-        tap? (e: RatingEventArgs): void;
-        change? (e: RatingEventArgs): void;
-        touchMove? (e: RatingEventArgs): void;
-    }
-    interface RatingEventArgs {
-        cancel: boolean;
-        type: string;
-        model: RatingOptions;
-        value: number;
-    }
-    
-    /*Rating*/
-
-    /*Rotator-Start ejmRotator*/
-    class Rotator extends EJ.Core.Widget {
-        static fn: Rotator;
-        element: JQuery;
-        constructor(element: JQuery, options?: RotatorOptions);
-        model: Object;
-        validTags: Array<string>;
-        defaults: RotatorOptions;
-        renderDatasource(any): void;
-
-
-    }
-    interface RotatorOptions {
-        swipeLeft? (e: RotatorEventArgs): void;
-        swipeRight? (e: RotatorEventArgs): void;
-        targetId?: string;
-        renderMode?: string;
-        targetHeight?: number;
-        targetWidth?: number;
-        theme?: string;
-        currentItemIndex?: number;
-        showPager?: boolean;
-        showHeader?: boolean;
-        headerTitle?: string;
-        dataBinding?: boolean;
-        dataSource?: any;
-        pagerPosition?: string;
-    }
-    interface RotatorEventArgs {
-        cancel: boolean;
-        model: Object;
-        type: string;
-        targetElement: string;
-        value: number;
-
-    }
-   
-    /*Rotator-End*/
-
-
-
-    /*Slider*/
-    //Class ejmSlider
-    class Slider extends EJ.Core.Widget {
-        static fn: Slider;
-        element: JQuery;
-        constructor(element: JQuery, options?: SliderOptions);
-        model: Object;
-        defaults: SliderOptions;
-        getValue(): void;
-
-    }
-    //ejmSlider Option
-    interface SliderOptions {
-        theme?: string;
-        renderMode?: string;
-        minValue?: number;
-        maxValue?: number;
-        value?: number;
-        values?: number[];
-        orientation?: string;
-        enableRange?: boolean;
-        readOnly?: boolean;
-        incrementStep?: number;
-        persist?: number;
-        enabled?: boolean;
-        enableAnimation?: boolean;
-        animationSpeed?: number;
-        ios7?: Ios7Option;
-        windows?: windowsOption;
-        touchStart? (e: SliderStartEndChangeEventArgs): void;
-        touchEnd? (e: SliderStartEndChangeEventArgs): void;
-        load? (e: SliderLoadEventArgs): void;
-        change? (e: SliderStartEndChangeEventArgs): void;
-        slide? (e: SliderSlideEventArgs): void;
-    }
-
-    //ejmSlider IOS7 Option
-    interface Ios7Option {
-        thumbStyle?: string;
-    }
-    //ejmSlider Slide Event Arugument
-    interface SliderSlideEventArgs {
-        value: number;
-        values: number[];
-        type: string;
-        cancel: boolean;
-    }
-    //ejmSlider Load Event Arugument
-    interface SliderLoadEventArgs {
-        value: number;
-        values: number[];
-        cancel: boolean;
-    }
-    //ejmSlider Touch Start, End and Change Event Arugument
-    interface SliderStartEndChangeEventArgs {
-        value: number;
-        type: string;
-        cancel: boolean;
-    }
-    
-    /*Slider*/
-
-    /* Tab */
-    class Tab extends EJ.Core.Widget {
-        static fn: Tab;
-        constructor(element: JQuery, options?: TabOptions);
-        defaults: TabOptions;
-        showBadge(index: number): void;
-        hideBadge(index: number): void;
-        updateBadgeValue(index: number, value: number): void;
-        selectItem(index?: number): void;
-        enable(index?: number): void;
-        disable(index?: number): void;
-        enableContent(index?: number): void;
-        disableContent(index?: number): void;
-        add(tab: Object, index: number): void;
-        addOverflowItem(tab: Object, index: number): void;
-        remove(index: number): void;
-        removeOverflowItem(index: number): void;
-        getItemsCount(): number;
-        getOverflowItemCount(): number;
-    }
-
-    interface TabOptions {
-        renderMode?: string;
-        theme?: string;
-        allowScrolling?: boolean;
-        enableAjax?: boolean;
-        badge?: badgeTabOptions;
-        ios7?: ios7TabOptions;
-        allowCache?: boolean;
-        selectedItemIndex?: number;
-        enabled?: boolean;
-        overflowBadge?: overflowBadgeTabOptions;
-        android?: androidTabOptions;
-        windows?: windowsTabOptions;
-        flat?: flatTabOptions;
-        load? (e: TabLoadEventArgs): void;
-        loadComplete? (e: TabLoadCompleteEventArgs): void;
-        touchStart? (e: TabTouchEventArgs): void;
-        touchEnd? (e: TabTouchEventArgs): void;
-        ajaxLoadSuccess? (e: TabAjaxLoadSuccessEventArgs): void;
-        ajaxLoadError? (e: TabAjaxLoadErrorEventArgs): void;
-        ajaxLoadComplete? (e: TabLoadEventArgs): void;
-        ajaxSettings?: ajaxSettingsTabOptions;
-    }
-    interface TabLoadEventArgs {
-        cancel: boolean;
-        type: string;
-        model: TabOptions;
-    }
-    interface TabLoadCompleteEventArgs {
-        cancel: boolean;
-        type: string;
-        model: TabOptions;
-        element: Object;
-        id: string;
-    }
-    interface TabTouchEventArgs {
-        cancel: boolean;
-        type: string;
-        model: TabOptions;
-    }
-
-    interface TabAjaxLoadSuccessEventArgs {
-        cancel: boolean;
-        type: string;
-        model: TabOptions;
-        element: Object;
-        currentContent: string;
-    }
-
-    interface TabAjaxLoadErrorEventArgs {
-        cancel: boolean;
-        type: string;
-        model: TabOptions;
-        status: boolean;
-        error: string;
-    }
-    interface badgeTabOptions {
-        enabled?: boolean;
-        value?: number;
-        maxValue?: number;
-    }
-    interface ios7TabOptions {        
-        imageClass?: string;
-    }
-    interface overflowBadgeTabOptions {
-        enabled?: boolean;
-        value?: number;
-        maxValue?: number;
-    }
-    interface androidTabOptions {
-        showImage?: boolean;
-        imageClass?: string;
-        postion?: string;
-    }
-    interface windowsTabOptions extends windowsOption {
-        enableCustomText?: boolean;
-        position?: string;
-    }
-    interface flatTabOptions {
-        position?: string;
-    }
-    interface ajaxSettingsTabOptions {
-        type?: string;
-        cache?: boolean;
-        async?: boolean;
-        dataType?: string;
-        contentType?: string;
-        url?: string;
-        data?: Array<any>;
-    }
-
-    /* Tab */
-
-    /*Tile - Start*/
-    class Tile extends EJ.Core.Widget {
-        static fn: Tile;
-        element: JQuery;
-        constructor(element: JQuery, options?: TileOptions);
-        model: Object;
-        ValidTags: Array<string>;
-        defaults: TileOptions;
-        destroy(): void;
-        setShowText(boolean): void;
-        setBadgeEnable(boolean): void;
-        setBadgeValue(number): void;
-        setShowIcon(boolean): void;
-        setEnableLiveTile(boolean): void;
-        setImagePosition(string): void;
-        setRenderMode(string): void;
-        setText(string): void;
-        setTextAlignment(string): void;
-        setTileSize(string): void;
-    }
-
-    interface TileOptions {
-        showText?: boolean;
-        badge?: tileBadgeOptions;
-        showIcon?: boolean;
-        enableLiveTile?: boolean;
-        imageClass?: string;
-        imagePosition?: string;
-        imageUrl?: string;
-        liveTileType?: string;
-        renderMode?: string;
-        templateId?: string;
-        text?: string;
-        textAlignment?: string;
-        tileSize?: string;
-        type?: string;
-        updateinterval?: number;
-        touchEnd? (e: tileTouchEndEventArgs): void;
-        touchStart? (e: tileTouchStartEventArgs): void;
-    }
-
-    interface tileBadgeOptions {
-        enabled?: boolean;
-        maxValue?: number;
-        value?: number;
-    }
-
-    interface tileTouchEndEventArgs {
-        cancel: boolean;
-        model: TileOptions;
-        type: string;
-        text: string;
-    }
-
-    interface tileTouchStartEventArgs {
-        cancel: boolean;
-        model: TileOptions;
-        type: string;
-        text: string;
-    }
-    
-    /*Tile - End*/
-
-    /* TimePicker */
-    class TimePicker extends EJ.Core.Widget {
-        static fn: TimePicker;
-        constructor(element: JQuery, options?: TimePickerOptions);
-        model: Object;
-        defaults: TimePickerOptions;
-        show(): void;
-        hide(): void;
-        enable(): void;
-        disable(): void;
-        getValue(): void;
-        setCurrentTime(): void;
-    }
-    interface TimePickerOptions {
-        renderMode?: string;
-        theme?: string;
-        hourFormat?: string;
-        value?: string;
-        timeFormat?: string;
-        enabled?: boolean;
-        ios7?: ios7TimepickerOptions;
-        windows?: windowsOption;
-        select? (e: timepickerSelectEventArgs): void;
-        load? (e: timepickerLoadEventArgs): void;
-        focusIn? (e: timepickerLoadEventArgs): void;
-        focusOut? (e: timepickerLoadEventArgs): void;
-        open? (e: timepickerLoadEventArgs): void;
-        close? (e: timepickerLoadEventArgs): void;
-        change? (e: timepickerLoadEventArgs): void;
-    }
-    interface timepickerLoadEventArgs {
-        cancel: boolean;
-        type: string;
-        model: TimePickerOptions;
-        target: Object;
-        value: string;
-
-    }
-    interface timepickerSelectEventArgs {
-        cancel: boolean;
-        type: string;
-        model: TimePickerOptions;
-        target: Object;
-        value: string;
-    }
-    interface ios7TimepickerOptions {
-        renderDefault?: boolean;
-
-    }
-
-
-    /* ToggleButton */
-    //Class ejmToggleButton
-    class ToggleButton extends EJ.Core.Widget {
-        static fn: ToggleButton;
-        constructor(element: JQuery, options?: ToggleButtonOptions);
-        model: Object;
-        validTags: Array<string>;
-        defaults: ToggleButtonOptions;
-        enable(): void;
-        disable(): void;
-    }
-
-    //ejmToggleButton Option
-    interface ToggleButtonOptions {
-        theme?: string;
-        renderMode?: string;
-        animate?: boolean;
-        toggleState?: boolean;
-        windows?: windowsOption;
-        persist?: boolean;
-        enabled?: boolean;
-        change? (e: ToggleButtonEventArgs): void;
-        touchStart? (e: ToggleButtonEventArgs): void;
-        touchEnd? (e: ToggleButtonEventArgs): void;
-    }
-
-    //ToggleButtonEvent Arugument
-    interface ToggleButtonEventArgs {
-        cancel?: boolean;
-        type?: string;
-        model?: ToggleButtonOptions;
-        element?: Object;
-        state?: boolean;
-    }
-    /* ToggleButton*/
-
-    /* ToolBar*/
-    //Class ejmToolbar
-    class Toolbar extends EJ.Core.Widget {
-        static fn: Toolbar;
-        constructor(element: JQuery, options?: ToolbarOptions);
-        model: Object;
-        validTags: Array<string>;
-        defaults: ToolbarOptions;        
-        removeItem(number): void;
-        addItem(string): void;
-        showEllipsis(): void;
-        disableItem(string): void;
-        enableItem(string): void;
-        hideItem(string): void;
-        hideEllipsis(number): void;
-        showItem(string): void;  
-        hideMenu(): void;
-        showMenu(): void;
-    }
-
-    //ejmToolbar Android Options
-    interface ToolbarAndroidOptions {
-        title?: string;
-        titleIconUrl?: string;
-        showBackNavigator?: boolean;
-        showTitleIcon?: boolean;
-        enableSplitView?: boolean;
-        showEllipsis?: boolean;
-    }
-    //ejmToolbar Option
-    interface ToolbarOptions {
-        theme?: string;
-        renderMode?: string;
-        itemCollection?: Array<any>;
-        enabled?: boolean;
-        hide?: boolean;
-        toolbarPosition?: string;
-        android?: ToolbarAndroidOptions;
-        windows?: windowsOption;
-        templateId?: any;
-        iconUrl?: any;
-        touchStart? (e: ToolbarEventArgs): void;
-        touchEnd? (e: ToolbarEventArgs): void;
-                
-    }
-    //ejmToolbarEvent Arugument
-    interface ToolbarEventArgs {
-        cancel: boolean;
-        type: string;
-        model: ToolbarOptions;
-
-    }
-    
-    /* ToolBar*/
-
-    /*Group button*/
-    class GroupButton extends EJ.Core.Widget {
-        static fn: GroupButton;
-        element: JQuery;
-        constructor(element?: JQuery, options?: GroupButtonOptions);
-        model: Object;
-        defaults: GroupButtonOptions;
-        //add public functions
-    }
-    interface GroupButtonOptions {
-        selectedItemIndex?: number;
-        renderMode?: string;
-        theme?: string;
-        windows?: windowsOption;
-        touchStart? (e: GroupButtonEventArgs): void;
-        touchEnd? (e: GroupButtonEventArgs): void;
-    }
-    interface GroupButtonEventArgs {
-        cancel: boolean;
-        type: string;
-        model: GroupButtonOptions;
-    }
-    /*Group button*/
-
-    /* SplitPane */
-    class SplitPane extends EJ.Core.Widget {
-        static fn: SplitPane;
-        element: JQuery;
-        constructor(element: JQuery, options?: SplitPaneOptions);
-        model: Object;
-        defaults: SplitPaneOptions;
-        loadContent(toPage: string, options?: any): void;
-        transferPage(toPage, options, existing): void;
-    }
-    interface SplitPaneOptions {
-        renderMode?: string;
-        theme?: string;
-        leftHeaderTitle?: string;
-        rightHeaderTitle?: string;
-        allowLeftPaneScrolling?: boolean;
-        allowRightPaneScrolling?: boolean;
-        checkDOMChanges?: boolean;
-        enableNativeScrolling?: boolean;
-        leftHeaderTemplateId?: string;
-        rightHeaderTemplateId?: string;
-        leftPaneWidth?: number;
-        android?: SplitPaneAndroidOptions;
-        windows?: windowsSplitPaneOptions;
-        ios7?: SplitPaneIOS7Options;
-    }
-    interface SplitPaneAndroidOptions {
-        showToolbar?: boolean;
-        toolbarTitle?: string;
-        toolbarTheme?: string;
-        showToolbarIcon?: boolean;
-        showBackNavigator?: boolean;
-        showToolbarEllipsis?: boolean;
-    }
-    interface windowsSplitPaneOptions {
-        showLeftHeader?: boolean;
-        showRightHeader?: boolean;
-        headerLeftButtonStyle?: string;
-        headerRightButtonStyle?: string;
-    }
-    interface SplitPaneIOS7Options {
-        showLeftPaneHeader?: boolean;
-        showRightPaneHeader?: boolean;
-        headerLeftButtonCaption?: string;
-        headerLeftButtonStyle?: string;
-        showHeaderLeftButton?: boolean;
-        //headerLeftButtonTap? (e: FooterButtonEvent): void;
-        headerRightButtonCaption?: string;
-        headerRightButtonStyle?: string;
-        showHeaderRightButton?: boolean;
-        //headerRightButtonTap? (e: FooterButtonEvent): void;
-    }
-
-    /* SplitPane */
-    /* Dialog */
-    class Dialog extends EJ.Core.Widget {
-        static fn: Dialog;
-        element: JQuery;
-        constructor(element: JQuery, options?: DialogOptions);
-        model: Object;
-        defaults: DialogOptions;
-        open(): void;
-        close(): void;
-        isOpened(): void;
-    }
-    interface DialogOptions {
-        enableAutoOpen?: boolean;
-        title?: string;
-        beforeClose? (e: DialogBeforeClose): void;
-        open? (e: DialogOpen): void;
-        close? (e: DialogClose): void;
-        buttonTap? (e: DialogButtonTap): void;
-        renderMode?: string;
-        theme?: string;
-        enableModal?: boolean;
-        enableButtons?: boolean;
-        allowScrolling?: boolean;
-        enableNativeScrolling?: boolean;
-        mode?: string;
-        leftButtonCaption?: string;
-        rightButtonCaption?: string;
-        checkDOMChanges?: boolean;
-        templateId?: string;
-        targetHeight?: number;
-        windows?: windowsOption;
-    }
-    interface DialogBeforeClose {
-        cancel: boolean;
-        type: string;
-        model: DialogOptions;
-    }
-    interface DialogOpen {
-        cancel: boolean;
-        type: string;
-        model: DialogOptions;
-        element: Object;
-        text: string;
-    }
-    interface DialogClose {
-        cancel: boolean;
-        type: string;
-        model: DialogOptions;
-        title: string;
-        element: Object;
-    }
-    interface DialogButtonTap {
-        cancel: boolean;
-        type: string;
-        model: DialogOptions;
-        text: string;
-    }
-    /* Dialog */
-    /* Textbox */
-    class TextboxCommon extends EJ.Core.Widget {
-        model: Object;
-        disable(): void;
-        enable(): void;
-        getStrippedValue(string): string;
-        getUnstrippedValue(string): string;
-        getValue(string): string;
-        getWatermarkText(string): string;
-    }
-    class TextBox extends TextboxCommon {
-        static fn: TextBox;
-        constructor(element: JQuery, options?: TextBoxOptions);
-        defaults: TextBoxOptions;
-    }
-    /* Password */
-    class Password extends TextboxCommon {
-        static fn: Password;
-        constructor(element: JQuery, options?: TextBoxOptions);
-        defaults: TextBoxOptions;
-    }
-    /* MaskEdit */
-    class MaskEdit extends TextboxCommon {
-        static fn: MaskEdit;
-        constructor(element: JQuery, options?: MaskEditOptions);
-        defaults: MaskEditOptions;
-
-    }
-    /* TextArea */
-    class TextArea extends TextboxCommon {
-        static fn: TextArea;
-        constructor(element: JQuery, options?: TextBoxOptions);
-        defaults: TextBoxOptions;
-
-    }
-    interface TextBoxOptions {
-        renderMode?: string;
-        theme?: string;
-        showBorder?: boolean;
-        windows?: WindowsTextBoxOptions;
-        indicateError?: boolean;
-        value?: string;
-        watermarkText?: string;
-        change? (e: TextBoxEventArgs): void;
-        enabled?: boolean;
-        persist?: boolean;
-        readOnly?: boolean;
-    }
-    interface MaskEditOptions extends TextBoxOptions {
-        mask?: string;
-    }
-    interface WindowsTextBoxOptions extends windowsOption {
-        showReset?: boolean;
-    }
-    interface TextBoxEventArgs {
-        cancel: boolean;
-        type: string;
-        element: Object;
-        value: string;
-        isChecked: boolean;
-    }
-    /* Textbox */
-    /*Footer*/
-    class Footer extends EJ.Core.Widget {
-        static fn: Footer;
-        element: JQuery;
-        constructor(element: JQuery, options?: FooterOptions);
-        model: Object;
-        defaults: FooterOptions;
-        getTitle(): string;
-    }
-
-    interface FooterOptions {
-        hideForUnSupportedDevice?: boolean;
-        leftButtonNavigationUrl?: string;
-        rightButtonNavigationUrl?: string;
-        title?: string;
-        showTitle?: boolean;
-        position?: string;
-        leftButtonCaption?: string;
-        rightButtonCaption?: string;
-        renderMode?: string;
-        theme?: string;
-        showLeftButton?: boolean;
-        showRightButton?: boolean;
-        templateId?: string;
-        windows?: FooterWindowsOptions;
-        leftButtonTap? (e: FooterLeftButtonTapEventArgs): void;
-        rightButtonTap? (e: FooterRightButtonTapEventArgs): void;
-    }
-    interface FooterWindowsOptions extends windowsOption {
-        renderDefault?: boolean;
-    }
-    interface FooterLeftButtonTapEventArgs {
-        text: string;
-        cancel: boolean;
-        model: Object;
-        type: string;
-        status: boolean;
-    }
-    interface FooterRightButtonTapEventArgs {
-        text: string;
-        cancel: boolean;
-        model: Object;
-        type: string;
-        status: boolean;
-    }
-    
-    /*Footer*/
-
-    /* Checkbox */
-    class CheckBox extends EJ.Core.Widget {
-        static fn: CheckBox;
-        constructor(element: JQuery, options?: CheckBoxOptions);
-        model: Object;
-        defaults: CheckBoxOptions;
-        isChecked(): boolean;
-    }
-    interface CheckBoxOptions {
-        touchStart? (e: CheckBoxTouchStart): void;
-        touchEnd? (e: CheckBoxTouchEnd): void;
-        renderMode?: string;
-        preventDefault?: boolean;
-        theme?: string;
-        enabled?: boolean;
-        checked?: boolean;
-        enableTriState?: boolean;
-        state?: string;
-        windows?: windowsOption;
-        text?: string;
-    }
-    interface CheckBoxTouchStart {
-        cancel: boolean;
-        type: string;
-        model: CheckBoxOptions;
-        element: Object;
-        value: string;
-        isChecked: boolean;
-    }
-    interface CheckBoxTouchEnd {
-        cancel: boolean;
-        type: string;
-        model: CheckBoxOptions;
-        element: Object;
-        value: string;
-        isChecked: boolean;
-    }
-   
-    /* Checkbox */
-    /* Scrollpanel */
-    class ScrollPanel extends EJ.Core.Widget {
-        static fn: ScrollPanel;
-        constructor(element: JQuery, target: any, options?: ScrollPanelOptions);
-        model: Object;
-        defaults: ScrollPanelOptions;
-        refresh(): void;
-    }
-    interface ScrollPanelOptions {
-        renderMode?: string;
-        theme?: string;
-        enableResize?: boolean;
-        targetHeight?: number;
-        targetWidth?: number;
-        scrollHeight?: number;
-        scrollWidth?: number;
-        target: any;
-        enableFade?: boolean;
-        enableShrink?: boolean;
-        setAutoHeight?: boolean;
-        isRelative?: boolean;
-        wheelSpeed?: number;
-        enableInteraction?: boolean;
-        enabled?: boolean;
-        checkDOMChanges?: boolean;
-        enableHrScroll?: boolean;
-        enableVrScroll?: boolean;
-        zoomMin?: number;
-        zoomMax?: number;
-        adjustFixedPosition?: boolean;
-        startZoom?: number;
-        startX?: number;
-        startY?: number;
-        disablePointer?: boolean;
-        disableMouse?: boolean;
-        disableTouch?: boolean;
-        directionLockThreshold?: number;
-        momentum?: boolean;
-        enableBounce?: boolean;
-        bounceTime?: number;
-        preventDefault?: boolean;
-        enableTransform?: boolean;
-        enableTransition?: boolean;
-        showScrollbars?: boolean;
-        enableMouseWheel?: boolean;
-        enableKeys?: boolean;
-        enableZoom?: boolean;
-        enableNativeScrolling?: boolean;
-        invertWheel?: boolean;
-        scrollStart? (e: scrollStart): void;
-        scrollMove? (e: scrollMove): void;
-        scrollEnd? (e: scrollEnd): void;
-        beforeScrollStart? (e: beforeScrollStart): void;
-        zoomStart? (e: zoomStart): void;
-        zoomEnd? (e: zoomEnd): void;
-    }
-    interface scrollStart {
-        cancel: boolean;
-        type: string;
-        model: ScrollPanelOptions;
-        x: number;
-        y: number;
-    }
-    interface scrollMove {
-        cancel: boolean;
-        type: string;
-        model: ScrollPanelOptions;
-        x: number;
-        y: number;
-    }
-    interface scrollEnd {
-        cancel: boolean;
-        type: string;
-        model: ScrollPanelOptions;
-        x: number;
-        y: number;
-    }
-    interface beforeScrollStart {
-        cancel: boolean;
-        type: string;
-        model: ScrollPanelOptions;
-        x: number;
-        y: number;
-    }
-    interface zoomStart {
-        cancel: boolean;
-        type: string;
-        model: ScrollPanelOptions;
-        x: number;
-        y: number;
-    }
-    interface zoomEnd {
-        cancel: boolean;
-        type: string;
-        model: ScrollPanelOptions;
-        x: number;
-        y: number;
-    }
-    /* Scrollpanel */
-   
-}
-declare module ej.datavisualization {
-
-    //#region LinearGauge End
-    class LinearGauge extends EJ.Core.Widget {
-        static fn: LinearGauge;
-        static extend(prototype: Object): LinearGauge;
-        constructor(element: JQuery, options?: LinearGaugeOptions);
-
-        destroy(): void;
-        exportImage(fileName: number, fileType: number): void;
-        getBarDistanceFromScale(scaleIndex: number, pointerIndex: number): void;
-        getBarPointerValue(scaleIndex: number, pointerIndex: number): void;
-        getBarWidth(scaleIndex: number, pointerIndex: number): void;
-        getCustomLabelAngle(scaleIndex: number, customLabelIndex: number): void;
-        getCustomLabelValue(scaleIndex: number, customLabelIndex: number): void;
-        getIndicatorValue(scaleIndex: number, indicatorIndex: number): void;
-        getLabelAngle(scaleIndex: number, labelIndex: number): void;
-        getLabelPlacement(scaleIndex: number, labelIndex: number): void;
-        getLabelStyle(scaleIndex: number, labelIndex: number): void;
-        getLabelXDistanceFromScale(scaleIndex: number, labelIndex: number): void;
-        getLabelYDistanceFromScale(scaleIndex: number, labelIndex: number): void;
-        getMajorIntervalValue(scaleIndex: number): void;
-        getMarkerStyle(scaleIndex: number, pointerIndex: number): void;
-        getMaximumValue(scaleIndex: number): void;
-        getMinimumValue(scaleIndex: number, pointerIndex: number): void;
-        getMinorIntervalValue(scaleIndex: number): void;
-        getPointerDistanceFromScale(scaleIndex: number, pointerIndex: number): void;
-        getPointerHeight(scaleIndex: number, pointerIndex: number): void;
-        getPointerPlacement(scaleIndex: number, pointerIndex: number): void;
-        getPointerWidth(scaleIndex: number, pointerIndex: number): void;
-        getRangeBorderWidth(scaleIndex: number, rangeIndex: number): void;
-        getRangeDistanceFromScale(scaleIndex: number, rangeIndex: number): void;
-        getRangeEndValue(scaleIndex: number, rangeIndex: number): void;
-        getRangeEndWidth(scaleIndex: number, rangeIndex: number): void;
-        getRangePosition(scaleIndex: number, rangeIndex: number): void;
-        getRangeStartValue(scaleIndex: number, rangeIndex: number): void;
-        getRangeStartWidth(scaleIndex: number, rangeIndex: number): void;
-        getScaleBarLength(scaleIndex: number): void;
-        getScaleBarSize(scaleIndex: number, pointerIndex: number): void;
-        getScaleBorderWidth(scaleIndex: number): void;
-        getScaleDirection(scaleIndex: number): void;
-        getScaleLocation(scaleIndex: number): void;
-        getScaleStyle(scaleIndex: number): void;
-        getTickAngle(scaleIndex: number, TickIndex: number): void;
-        getTickHeight(scaleIndex: number, TickIndex: number): void;
-        getTickPlacement(scaleIndex: number, TickIndex: number): void;
-        getTickStyle(scaleIndex: number, TickIndex: number): void;
-        getTickWidth(scaleIndex: number, TickIndex: number): void;
-        getTickXDistanceFromScale(scaleIndex: number, TickIndex: number): void;
-        getTickYDistanceFromScale(scaleIndex: number, TickIndex: number): void;
-        scales(): void;
-        setBarDistanceFromScale(scaleIndex: number, pointerIndex: number, value: number): void;
-        setBarPointerValue(scaleIndex: number, pointerIndex: number, value: number): void;
-        setBarWidth(scaleIndex: number, pointerIndex: number, value: number): void;
-        setCustomLabelAngle(scaleIndex: number, customLabelIndex: number, value: number): void;
-        setCustomLabelValue(scaleIndex: number, customLabelIndex: number, value: number): void;
-        setIndicatorValue(scaleIndex: number, indicatorIndex: number, value: number): void;
-        setLabelAngle(scaleIndex: number, labelIndex: number, angle: number): void;
-        setLabelPlacement(scaleIndex: number, labelIndex: number, value: number): void;
-        setLabelStyle(scaleIndex: number, labelIndex: number, value: string): void;
-        setLabelXDistanceFromScale(scaleIndex: number, labelIndex: number, value: number): void;
-        setLabelYDistanceFromScale(scaleIndex: number, labelIndex: number, value: number): void;
-        setMajorIntervalValue(scaleIndex: number, value: number): void;
-        setMarkerStyle(scaleIndex: number, pointerIndex: number, value: string): void;
-        setMaximumValue(scaleIndex: number, value: number): void;
-        setMinimumValue(scaleIndex: number, value: number): void;
-        setMinorIntervalValue(scaleIndex: number, value: number): void;
-        setPointerDistanceFromScale(scaleIndex: number, pointerIndex: number, value: number): void;
-        setPointerHeight(scaleIndex: number, pointerIndex: number, height: number): void;
-        setPointerPlacement(scaleIndex: number, pointerIndex: number, value: number): void;
-        setPointerValue(scaleIndex: number, pointerIndex: number, value: number): void;
-        setPointerWidth(scaleIndex: number, pointerIndex: number, width: number): void;
-        setRangeBorderWidth(scaleIndex: number, rangeIndex: number, value: number): void;
-        setRangeDistanceFromScale(scaleIndex: number, rangeIndex: number, value: number): void;
-        setRangeEndValue(scaleIndex: number, rangeIndex: number, value: number): void;
-        setRangeEndWidth(scaleIndex: number, rangeIndex: number, value: number): void;
-        setRangePosition(scaleIndex: number, rangeIndex: number, value: number): void;
-        setRangeStartValue(scaleIndex: number, rangeIndex: number, value: number): void;
-        setRangeStartWidth(scaleIndex: number, rangeIndex: number, value: number): void;
-        setScaleBarLength(scaleIndex: number, value: number): void;
-        setScaleBarSize(scaleIndex: number, value: number): void;
-        setScaleBorderWidth(scaleIndex: number, value: number): void;
-        setScaleDirection(scaleIndex: number, value: number): void;
-        setScaleLocation(scaleIndex: number, value: Object): void;
-        setScaleStyle(scaleIndex: number, value: number): void;
-        setTickAngle(scaleIndex: number, TickIndex: number, angle: number): void;
-        setTickHeight(scaleIndex: number, TickIndex: number, value: number): void;
-        setTickPlacement(scaleIndex: number, TickIndex: number, value: number): void;
-        setTickStyle(scaleIndex: number, TickIndex: number, value: string): void;
-        setTickWidth(scaleIndex: number, TickIndex: number, value: number): void;
-        setTickXDistanceFromScale(scaleIndex: number, TickIndex: number, value: number): void;
-        setTickYDistanceFromScale(scaleIndex: number, TickIndex: number, value: number): void;
-    }
-    enum Direction {
-        clockwise,
-        counterClockwise
-    }
-    enum ScaleType {
-        rectangle,
-        roundedrectangle,
-        thermometer
-    }
-    enum Theme {
-        flatlight,
-        flatdark
-    }
-    enum ScalesCustomLabelsFontStyle {
-        bold,
-        italic,
-        regular,
-        strikeout,
-        underline
-    }
-    enum ScalesLabelsPlacement {
-        near,
-        far,
-        center
-    }
-    enum ScalesLabelsType {
-        major,
-        minor
-    }
-    enum ScalesLabelsUnitTextPlacement {
-        back,
-        front
-    }
-    enum ScalesMarkerPointersPlacement {
-        near,
-        far,
-        center
-    }
-    enum ScalesMarkerPointersType {
-        rectangle,
-        triangle,
-        ellipse,
-        diamond,
-        pentagon,
-        circle,
-        star,
-        slider,
-        pointer,
-        wedge,
-        trapezoid,
-        roundedrectangle
-    }
-    enum ScalesRangesPlacement {
-        near,
-        far,
-        center
-    }
-    enum ScalesTicksPlacement {
-        near,
-        far,
-        center
-    }
-    enum ScalesTicksType {
-        majorinterval,
-        minorinterval
-    }
-    //ejLinearGauge Frame Options
-    interface LinearGaugeFrameOptions {
-        backgroundImageUrl?: string;
-        innerWidth?: number;
-        outerWidth?: number;
-    }
-    interface LinearGaugeScaleOptions {
-        backgroundColor?: string;
-        barPointers?: LinearGaugeScaleBarPointersOptions;
-        border?: LinearGaugeScaleBorderOptions;
-        customLabels?: LinearGaugeScaleCustomLabelsOptions;
-        direction?: string;
-        indicators?: Array<LinearGaugeScalesIndicatorsOptions>;
-        labels?: Array<LinearGaugeScalesLabelsOptions>;
-        length?: number;
-        majorIntervalValue?: number;
-        markerPointers?: Array<LinearGaugeScalesMarkerpointersOptions>;
-        maximum?: number;
-        minimum?: number;
-        minorIntervalValue?: number;
-        opacity?: number;
-        position?: LinearGaugeScalesPositionOptions;
-        ranges?: Array<LinearGaugeScalesRangesOptions>;
-        shadowOffset?: number;
-        showBarPointers?: boolean;
-        showCustomLabels?: boolean;
-        showIndicators?: boolean;
-        showLabels?: boolean;
-        showMarkerPointers?: boolean;
-        showRanges?: boolean;
-        showTicks?: boolean;
-        ticks?: Array<LinearGaugeScalesTicks>;
-        type?: string;
-        width?: number;
-    }
-    interface LinearGaugeScaleBarPointersOptions {
-        backgroundColor?: string;
-        border?: LinearGaugeScaleBarPointersBorderOptions;
-        distanceFromScale?: number;
-        gradients?: Object;
-        opacity?: number;
-        value?: number;
-        width?: number;
-    }
-    interface LinearGaugeScaleBorderOptions {
-        color?: string;
-        width?: number;
-    }
-    interface LinearGaugeScaleCustomLabelsOptions {
-        color?: string;
-        font?: LinearGaugeCustomLabelFontOptions;
-        opacity?: string;
-        position?: LinearGaugeCustomLabelsPositionOptions;
-        textAngle?: number;
-        value?: string;
-    }
-    interface LinearGaugeCustomLabelFontOptions {
-        fontFamily?: string;
-        fontStyle?: string;
-        size?: string;
-    }
-    interface LinearGaugeCustomLabelsPositionOptions {
-        x?: number;
-        y?: number;
-    }
-
-    interface LinearGaugeScaleBarPointersBorderOptions {
-        color?: string;
-        width?: number;
-    }
-    interface LinearGaugeScalesIndicatorsOptions {
-        backgroundColor?: string;
-        border?: LinearGaugeScalesIndicatorsBorderOptions;
-        font?: LinearGaugeScalesIndicatorsFontOptions;
-        height?: number;
-        opacity?: number;
-        position?: LinearGaugeScalesIndicatorsPositionOptions;
-        stateRanges?: Array<LinearGaugeScalesIndicatorsStateRangesOptions>;
-        textLocation?: LinearGaugeScalesIndicatorsTextLocationOptions;
-        type?: number;
-        value?: number;
-        width?: number;
-    }
-    interface LinearGaugeScalesIndicatorsBorderOptions {
-        color?: string;
-        width?: number;
-    }
-    interface LinearGaugeScalesIndicatorsFontOptions {
-        fontFamily?: string;
-        fontStyle?: string
-        size?: string;
-    }
-    interface LinearGaugeScalesIndicatorsPositionOptions {
-        x?: number;
-        y?: number;
-    }
-    interface LinearGaugeScalesIndicatorsStateRangesOptions {
-        backgroundColor?: string;
-        borderColor?: string;
-        endValue?: number;
-        startValue?: number;
-        text?: string;
-        textColor?: string;
-    }
-    interface LinearGaugeScalesIndicatorsTextLocationOptions {
-        x?: number;
-        y?: number;
-    }
-    interface LinearGaugeScalesLabelsOptions {
-        angle?: number;
-        distanceFromScale?: LinearGaugeScalesLabelsDistanceFromScaleOptions;
-        font?: Object;
-        includeFirstValue?: boolean;
-        opacity?: number;
-        placement?: string;
-        textColor?: string;
-        type?: string;
-        unitText?: string;
-        unitTextPlacement?: string;
-    }
-    interface LinearGaugeScalesLabelsDistanceFromScaleOptions {
-        x?: number;
-        y?: number;
-    }
-    interface LinearGaugeScalesLabelsFontOptions {
-        fontFamily?: string;
-        fontStyle?: string;
-        size?: string;
-    }
-    interface LinearGaugeScalesMarkerpointersOptions {
-        backgroundColor?: string;
-        border?: LinearGaugeMarkerPointersBorderOption;
-        distanceFromScale?: number;
-        gradients?: Object;
-        length?: number;
-        opacity?: number;
-        placement?: string;
-        type?: string;
-        value?: number;
-        width?: number;
-    }
-    interface LinearGaugeMarkerPointersBorderOption {
-        color?: string;
-    }
-    interface LinearGaugeScalesPositionOptions {
-        x?: number;
-        y?: number;
-    }
-    interface LinearGaugeScalesRangesOptions {
-        backgroundColor?: string;
-        border?: LinearGaugeScalesRangesBorderOptions;
-        distanceFromScale?: number;
-        endValue?: number;
-        endWidth?: number;
-        gradients?: Object;
-        opacity?: number;
-        placement?: string;
-        startValue?: number;
-        startWidth?: number;
-    }
-    interface LinearGaugeScalesRangesBorderOptions {
-        color?: string;
-        width?: number;
-    }
-
-    interface LinearGaugeScalesTicks {
-        angle?: number;
-        color?: string;
-        distanceFromScale?: LinearGaugeScalesTicksDistanceFromScale;
-        height?: number;
-        opacity?: number;
-        placement?: string;
-        type?: string;
-        width?: number;
-    }
-    interface LinearGaugeScalesTicksDistanceFromScale {
-        x?: number;
-        y?: number;
-    }
-
-    //ejLinearGauge Option
-    interface LinearGaugeOptions {
-        animationSpeed?: number;
-        backgroundColor?: string;
-        borderColor?: string;
-        enableAnimation?: boolean;
-        enableResize?: boolean;
-        frame?: LinearGaugeFrameOptions;
-        height?: number;
-        labelColor?: string;
-        maximum?: number;
-        minimum?: number;
-        orientation?: string;
-        pointerGradient1?: string;
-        pointerGradient2?: string;
-        readOnly?: boolean;
-        scale?: Array<LinearGaugeScaleOptions>;
-        theme?: string;
-        tickColor?: string;
-        value?: number;
-        width?: number;
-        drawBarPointers? (e: LinearGaugeDrawBarPointersEventArgs): void;
-        drawCustomLabel? (e: LinearGaugeDrawCustomLabelEventArgs): void;
-        drawIndicators? (e: LinearGaugeDrawIndicatorsEventArgs): void;
-        drawLabels? (e: LinearGaugeDrawLabelsEventArgs): void;
-        drawMarkerPointers? (e: LinearGaugeDrawMarkerPointersEventArgs): void;
-        drawRange? (e: LinearGaugeDrawRangeEventArgs): void;
-        drawTicks? (e: LinearGaugeDrawTicksEventArgs): void;
-        init? (e: LinearGaugeInitEventArgs): void;
-        load? (e: LinearGaugeInitEventArgs): void;
-        mouseClick? (e: LinearGaugeMouseClickEventArgs): void;
-        mouseClickMove? (e: LineargaugeMouseClickMoveEventArgs): void;
-        mouseClickUp? (e: LinearGaugeMouseClickEventArgs): void;
-        renderComplete? (e: LinearGaugeRenderCompleteEventArgs): void;
-    }
-    //ejLinearGaugeEvent Arugument
-    interface LinearGaugeDrawBarPointersEventArgs {
-        object: Object;
-        cancel: boolean;
-        context: Object;
-        position: Object;
-        Model: Object;
-        scaleElement: Object;
-        scaleIndex: number;
-        style: string;
-        barElement: Object;
-        barPointerIndex: number;
-        PointerValue: number;
-        type: string;
-    }
-    interface LinearGaugeDrawCustomLabelEventArgs {
-        object: Object;
-        cancel: boolean;
-        context: Object;
-        position: Object;
-        Model: Object;
-        scaleElement: Object;
-        scaleIndex: number;
-        style: string;
-        customLabelElement: Object;
-        customLabelrangeIndex: number;
-        type: string;
-    }
-    interface LinearGaugeDrawIndicatorsEventArgs {
-        object: Object;
-        cancel: boolean;
-        context: Object;
-        position: Object;
-        Model: Object;
-        scaleElement: Object;
-        scaleIndex: number;
-        style: string;
-        IndicatorElement: Object;
-        IndicatorIndex: number;
-        type: string;
-    }
-    interface LinearGaugeDrawLabelsEventArgs {
-
-        object: Object;
-        cancel: boolean;
-        context: Object;
-        position: Object;
-        Model: Object;
-        scaleElement: Object;
-        scaleIndex: number;
-        style: string;
-        label: LinearGaugeDrawLabelsInnerLabelEventArgs;
-        type: string;
-    }
-    interface LinearGaugeDrawLabelsInnerLabelEventArgs {
-        angle: number;
-        element: Object;
-        index: number;
-        value: number;
-    }
-    interface LinearGaugeDrawMarkerPointersEventArgs {
-        object: Object;
-        cancel: boolean;
-        context: Object;
-        position: Object;
-        Model: Object;
-        scaleElement: Object;
-        scaleIndex: number;
-        style: string;
-        markerElement: Object;
-        markerPointerIndex: number;
-        pointerValue: number;
-        pointerAngle: number;
-        type: string;
-    }
-    interface LinearGaugeDrawRangeEventArgs {
-        object: Object;
-        cancel: boolean;
-        context: Object;
-        position: Object;
-        Model: Object;
-        scaleElement: Object;
-        scaleIndex: number;
-        style: string;
-        rangeElement: Object;
-        rangeIndex: number;
-        type: string;
-    }
-    interface LinearGaugeDrawTicksEventArgs {
-        object: Object;
-        cancel: boolean;
-        context: Object;
-        position: Object;
-        Model: Object;
-        scaleElement: Object;
-        scaleIndex: number;
-        style: string;
-        tick: LinearGaugeDrawTicksTickEventArgs;
-        type: string;
-    }
-    interface LinearGaugeDrawTicksTickEventArgs {
-        angle: number;
-        element: Object;
-        index: number;
-        value: number;
-    }
-    interface LinearGaugeInitEventArgs {
-        object: Object;
-        cancel: boolean;
-        Model: Object;
-        scaleElement: Object;
-        context: Object;
-        type: string;
-    }
-    interface LinearGaugeMouseClickEventArgs {
-        object: Object;
-        cancel: boolean;
-        model: Object;
-        type: Object;
-        Model: Object;
-        scaleElement: Object;
-        scaleIndex: number;
-        context: Object;
-        index: number;
-        element: Object;
-        value: number;
-        style: string;
-        position: Object;
-    }
-    interface LineargaugeMouseClickMoveEventArgs {
-        object: Object;
-        cancel: boolean;
-        model: Object;
-        type: Object;
-        Model: Object;
-        scaleElement: Object;
-        scaleIndex: number;
-        context: Object;
-        markerpointer: LineargaugeMarkerpointerEventsArgs;
-        style: string;
-        position: Object;
-    }
-    interface LineargaugeMarkerpointerEventsArgs {
-        index: number;
-        element: Object;
-        value: number;
-    }
-    interface LinearGaugeRenderCompleteEventArgs {
-        object: Object;
-        cancel: boolean;
-        model: Object;
-        scaleElement: Object;
-        context: Object;
-        type: string;
-    }
-
-    //#endregion LinearGauge End
-
-    //#region CircularGauge
-    class CircularGauge extends EJ.Core.Widget {
-        static fn: CircularGauge;
-        static extend(prototype: Object): CircularGauge;
-        constructor(element: JQuery, options?: CircularGaugeOptions);
-        defaults: CircularGaugeOptions;
-        /* Medhods */
-        getIndicatorValue(scaleIndex: number, indicatorIndex: number): void;
-        setIndicatorValue(scaleIndex: number, indicatorIndex: number, value: number): void;
-        getPointerValue(scaleIndex: number, pointerIndex: number): void;
-        setMarkerDistanceFromScale(scaleIndex: number, pointerIndex: number, value: number): void;
-        getMarkerDistanceFromScale(scaleIndex: number, pointerIndex: number): void;
-        setPointerLength(scaleIndex: number, pointerIndex: number, value: number): void;
-        getPointerLength(scaleIndex: number, pointerIndex: number): void;
-        setPointerWidth(scaleIndex: number, pointerIndex: number, value: number): void;
-        getPointerWidth(scaleIndex: number, pointerIndex: number): void;
-        setBackNeedleLength(scaleIndex: number, pointerIndex: number, value: number): void;
-        getBackNeedleLength(scaleIndex: number, pointerIndex: number): void;
-        setNeedleStyle(scaleIndex: number, pointerIndex: number, value: number): void;
-        getNeedleStyle(scaleIndex: number, pointerIndex: number): void;
-        setPointerPlacement(scaleIndex: number, pointerIndex: number, value: number): void;
-        getPointerPlacement(scaleIndex: number, pointerIndex: number): void;
-        setPointerNeedleType(scaleIndex: number, pointerIndex: number, value: number): void;
-        getPointerNeedleType(scaleIndex: number, pointerIndex: number): void;
-        setMarkerStyle(scaleIndex: number, pointerIndex: number, value: number): void;
-        getMarkerStyle(scaleIndex: number, pointerIndex: number): void;
-        setCustomLabelValue(scaleIndex: number, customLabelIndex: number, value: number): void;
-        getCustomLabelValue(scaleIndex: number, customLabelIndex: number): void;
-        setSubGaugeLocation(scaleIndex: number, GaugeIndex: number, value: number): void;
-        getSubGaugeLocation(scaleIndex: number, GaugeIndex: number): void;
-        setCustomLabelAngle(scaleIndex: number, customLabelIndex: number, value: number): void;
-        getCustomLabelAngle(scaleIndex: number, customLabelIndex: number): void;
-        setRangeStartValue(scaleIndex: number, rangeIndex: number, value: number): void;
-        getRangeStartValue(scaleIndex: number, rangeIndex: number): void;
-        setRangeEndValue(scaleIndex: number, rangeIndex: number, value: number): void;
-        getRangeEndValue(scaleIndex: number, rangeIndex: number): void;
-        setRangeSize(scaleIndex: number, rangeIndex: number, value: number): void;
-        getRangeSize(scaleIndex: number, rangeIndex: number): void;
-        setRangeDistanceFromScale(scaleIndex: number, rangeIndex: number, value: number): void;
-        getRangeDistanceFromScale(scaleIndex: number, rangeIndex: number): void;
-        setRangePosition(scaleIndex: number, rangeIndex: number, value: number): void;
-        getRangePosition(scaleIndex: number, rangeIndex: number): void;
-        getRangeBorderWidth(scaleIndex: number, rangeIndex: number): void;
-        setPointerValue(scaleIndex: number, pointerIndex: number, value: number): void;
-        setLabelAngle(scaleIndex: number, labelIndex: number, value: number): void;
-        getLabelAngle(scaleIndex: number, labelIndex: number): void;
-        setLabelDistanceFromScale(scaleIndex: number, labelIndex: number, value: number): void;
-        getLabelDistanceFromScale(scaleIndex: number, labelIndex: number): void;
-        setLabelStyle(scaleIndex: number, labelIndex: number, value: number): void;
-        getLabelStyle(scaleIndex: number, labelIndex: number): void;
-        setLabelPlacement(scaleIndex: number, labelIndex: number, value: number): void;
-        getLabelPlacement(scaleIndex: number, labelIndex: number): void;
-        setTickAngle(scaleIndex: number, tickIndex: number, value: number): void;
-        getTickAngle(scaleIndex: number, tickIndex: number): void;
-        setTickStyle(scaleIndex: number, tickIndex: number, value: number): void;
-        getTickStyle(scaleIndex: number, tickIndex: number): void;
-        setTickPlacement(scaleIndex: number, tickIndex: number, value: number): void;
-        getTickPlacement(scaleIndex: number, tickIndex: number): void;
-        setTickWidth(scaleIndex: number, tickIndex: number, value: number): void;
-        getTickWidth(scaleIndex: number, tickIndex: number): void;
-        setTickHeight(scaleIndex: number, tickIndex: number, value: number): void;
-        getTickHeight(scaleIndex: number, tickIndex: number): void;
-        setTickDistanceFromScale(scaleIndex: number, tickIndex: number, value: number): void;
-        getTickDistanceFromScale(scaleIndex: number, tickIndex: number): void;
-        setStartAngle(scaleIndex: number, value: number): void;
-        getStartAngle(scaleIndex: number): void;
-        setSweepAngle(scaleIndex: number, value: number): void;
-        getSweepAngle(scaleIndex: number): void;
-        setMinimumValue(scaleIndex: number, value: number): void;
-        getMinimumValue(scaleIndex: number): void;
-        setMaximumValue(scaleIndex: number, value: number): void;
-        getMaximumValue(scaleIndex: number): void;
-        setScaleBarSize(scaleIndex: number, value: number): void;
-        getScaleBarSize(scaleIndex: number): void;
-        setScaleRadius(scaleIndex: number, value: number): void;
-        getScaleRadius(scaleIndex: number): void;
-        setMajorIntervalValue(scaleIndex: number, value: number): void;
-        getMajorIntervalValue(scaleIndex: number): void;
-        setMinorIntervalValue(scaleIndex: number, value: number): void;
-        getMinorIntervalValue(scaleIndex: number): void;
-        setPointerCapRadius(scaleIndex: number, value: number): void;
-        getPointerCapRadius(scaleIndex: number): void;
-        setScaleBorderWidth(scaleIndex: number, value: number): void;
-        getScaleBorderWidth(scaleIndex: number): void;
-        setPointerCapBorderWidth(scaleIndex: number, value: number): void;
-        getPointerCapBorderWidth(scaleIndex: number): void;
-        setScaleDirection(scaleIndex: number, value: number): void;
-        getScaleDirection(scaleIndex: number): void;
-        includeFirstValue(): void;
-        refreshSubGauge(): void;
-        refresh(): void;
-        redraw(value: string);
-        exportImage(filename: string, filetype: string): void;
-        resizeCanvas(): void;
-    }
-
-    //CircularGauge Options
-    interface CircularGaugeOptions {
-        value?: number;
-        minimum?: number;
-        maximum?: number;
-        radius?: number;
-        width?: number;
-        height?: number;
-        frame?: CircularGaugeFrameOptions;
-        backgroundColor?: string;
-        interiorGradient?: any;
-        readOnly?: boolean;
-        enableAnimation?: boolean;
-        animationSpeed?: number;
-        theme?: string;
-        isRadialGradient?: boolean;
-        enableResize?: boolean;
-        scales?: Array<ScaleOption>;
-        //Events
-        drawTicks(e: DrawTicksEventArgs): void;
-        drawLabels(e: DrawLabelsEventArgs): void;
-        drawPointers(e: DrawPointersEventArgs): void;
-        drawRange(e: DrawRangeEventArgs): void;
-        drawCustomLabel(e: DrawCustomLabelEventArgs): void;
-        drawIndicators(e: DrawIndicatorsEventArgs): void;
-        drawPointerCap(e: DrawPointerCapEventArgs): void;
-        load(e: CircularGaugeLoadEventArgs): void;
-        renderComplete(e: CircularGaugeLoadEventArgs): void;
-        mouseClick(e: CircularGaugeMouseEventArgs): void;
-        mouseClickMove(e: CircularGaugeMouseEventArgs): void;
-        mouseClickUp(e: CircularGaugeMouseEventArgs): void;
-    }
-
-    //Frame type Enum
-    enum frameType {
-        fullcircle,
-        halfcircle
-    }
-    //Direction Enum
-    enum direction {
-        clockwise,
-        counterclockwise,
-    }
-    //IndicatorTypestring Enum
-    enum indicatorTypestring {
-        rectangle,
-        circle,
-        roundedrectangle,
-        text,
-        image,
-    }
-    //LabelPlacementstring Enum
-    enum labelPlacementstring {
-        near,
-        far,
-        center,
-    }
-    //LabelTypestring Enum
-    enum labelTypestring {
-        major,
-        minor,
-    }
-    //markerType Enum
-    enum markerType {
-        rectangle,
-        triangle,
-        ellipse,
-        diamond,
-        pentagon,
-        circle,
-        slider,
-        pointer,
-        wedge,
-        trapezoid,
-        roundedrectangle,
-    }
-    //PointerPlacement  Enum
-    enum pointerPlacement {
-        near,
-        far,
-        center,
-    }
-    //pointerType Enum
-    enum pointerType {
-        needle,
-        marker,
-    }
-    //tickType Enum
-    enum tickType {
-        major,
-        minor,
-    }
-    //unitTextPlacement Enum
-    enum unitTextPlacement {
-        back,
-        front,
-    }
-    //theme Enum
-    enum theme {
-        flatlight,
-        flatdark,
-    }
-    //tickPlacement  Enum
-    enum tickPlacement {
-        near,
-        far,
-        center,
-    }
-    //rangePlacement  Enum
-    enum rangePlacement {
-        near,
-        far,
-        center,
-    }
-
-    //CircularGauge Scale Options
-    interface ScaleOption {
-        backgroundColor?: string;
-        border?: CircularGaugeBorderOptions;
-        direction?: string;
-        indicators?: Array<CircularGaugeIndicatorsOptions>;
-        labels?: Array<CircularGaugeLablesOptions>;
-        majorIntervalValue?: number;
-        maximum?: number;
-        minimum?: number;
-        minorIntervalValue?: number;
-        opacity?: number;
-        pointerCap?: CircularGaugePointerCapOptions;
-        pointers?: Array<CircularGaugePointerOptions>;
-        radius?: number;
-        ranges?: Array<CircularGaugeRangeOptions>;
-        shadowOffset?: number;
-        showIndicators?: boolean;
-        showLabels?: boolean;
-        showPointers?: boolean;
-        showRanges?: boolean;
-        showScaleBar?: boolean;
-        showTicks?: boolean;
-        size?: number;
-        startAngle?: number;
-        subGauges?: Array<CircularGaugeSubGaugeOptions>;
-        sweepAngle?: number;
-        angle?: number;
-        color?: string;
-        distanceFromScale?: number;
-        height?: number;
-        placement?: string;
-        type?: string;
-        width?: number;
-    }
-    //CircularGauge Border Options
-    interface CircularGaugeBorderOptions {
-        color?: string;
-        width?: number;
-    }
-    //CircularGauge indicators Options
-    interface CircularGaugeIndicatorsOptions {
-        height?: number;
-        imageUrl?: string;
-        position?: CircularGaugePositionOptions;
-        stateRanges?: Array<CircularGaugeStateRangesOptions>;
-        type?: string;
-        value?: number;
-        width?: number;
-    }
-    //CircularGauge lables Options
-    interface CircularGaugeLablesOptions {
-        angle?: number;
-        autoAngle?: boolean;
-        color?: string;
-        distanceFromScale?: number;
-        font?: CircularGaugeFontOptions;
-        includeFirstValue?: boolean;
-        opacity?: number;
-        placement?: string;
-        type?: string;
-        unitText?: string;
-        unitTextPosition?: string;
-    }
-    //CircularGauge pointerCap Options
-    interface CircularGaugePointerCapOptions {
-        backgroundColor?: string;
-        borderColor?: string;
-        borderWidth?: number;
-        interiorGradient?: Object;
-        radius?: number;
-    }
-    //CircularGauge pointer Options
-    interface CircularGaugePointerOptions {
-        backgroundColor?: string;
-        backNeedleLength?: number;
-        border?: CircularGaugeBorderOptions;
-        distanceFromScale?: number;
-        gradients?: Object;
-        length?: number;
-        markerType?: string;
-        needleType?: string;
-        opacity?: number;
-        placement?: string;
-        showBackNeedle?: boolean;
-        type?: string;
-        value?: number;
-        width?: number;
-    }
-    //CircularGauge range Options
-    interface CircularGaugeRangeOptions {
-        backgroundColor?: string;
-        border?: CircularGaugeBorderOptions;
-        distanceFromScale?: number;
-        endValue?: number;
-        endWidth?: number;
-        gradients?: Object;
-        opacity?: number;
-        placement?: string;
-        size?: number;
-        startValue?: number;
-        startWidth?: number;
-    }
-    //CircularGauge subGauge Options
-    interface CircularGaugeSubGaugeOptions {
-        height?: number;
-        position?: CircularGaugePositionOptions
-    width?: number;
-    }
-    //CircularGauge Position Options
-    interface CircularGaugePositionOptions {
-        x?: number;
-        y?: number;
-    }
-    //CircularGauge font Options
-    interface CircularGaugeFontOptions {
-        fontFamily?: string;
-        fontStyle?: string;
-        size?: string;
-    }
-    //CircularGaugeFrameOptions
-    interface CircularGaugeFrameOptions {
-        frameType?: string;
-        backgroundImageUrl?: string;
-        halfCircleFrameStartAngle?: number;
-        halfCircleFrameEndAngle?: number;
-    }
-    //CircularGaugeFrameOptions
-    interface CircularGaugeStateRangesOptions {
-        backgroundColor?: string;
-        borderColor?: string;
-        endValue?: number;
-        font?: CircularGaugeFontOptions;
-        startValue?: number;
-        text?: string;
-        textColor?: string;
-    }
-
-    //CircularGauge Mouse Arugument
-    interface CircularGaugeMouseEventArgs {
-        object: Object;
-        cancel: boolean;
-        model: Object;
-        type: Object;
-        scaleElement: Object;
-        scaleIndex: number;
-        context: Object;
-        pointer: CircularGaugeMousePointerOption;
-        style: string;
-        position: Object;
-    }
-    //CircularGauge drawCustomLabel Arugument
-    interface DrawCustomLabelEventArgs {
-        object: Object;
-        cancel: boolean;
-        context: Object;
-        model: Object;
-        type: Object;
-        scaleElement: Object;
-        scaleIndex: number;
-        position: Object;
-        style: string;
-        customLabelElement: Object;
-        customLabelIndex: number;
-    }
-    //CircularGauge drawIndicators Arugument
-    interface DrawIndicatorsEventArgs {
-        object: Object;
-        cancel: boolean;
-        context: Object;
-        model: Object;
-        type: Object;
-        scaleElement: Object;
-        scaleIndex: number;
-        position: Object;
-        style: string;
-        indicatorElement: Object;
-        indicatorIndex: number;
-    }
-    //CircularGauge drawLabels Arugument
-    interface DrawLabelsEventArgs {
-        object: Object;
-        cancel: boolean;
-        context: Object;
-        model: Object;
-        type: Object;
-        scaleElement: Object;
-        scaleIndex: number;
-        position: Object;
-        style: string;
-        label: Object;
-        pointerValue: number;
-    }
-    //CircularGauge drawPointerCap Arugument
-    interface DrawPointerCapEventArgs {
-        object: Object;
-        cancel: boolean;
-        context: Object;
-        model: Object;
-        type: Object;
-        scaleElement: Object;
-        position: Object;
-        style: string;
-    }
-    //CircularGauge drawPointers Arugument
-    interface DrawPointersEventArgs {
-        object: Object;
-        cancel: boolean;
-        context: Object;
-        model: Object;
-        type: Object;
-        scaleElement: Object;
-        scaleIndex: number;
-        position: Object;
-        style: string;
-        pointer: CircularGaugeMousePointerOption;
-    }
-    //CircularGauge drawRange Arugument
-    interface DrawRangeEventArgs {
-        object: Object;
-        cancel: boolean;
-        context: Object;
-        model: Object;
-        type: Object;
-        scaleElement: Object;
-        scaleIndex: number;
-        position: Object;
-        style: string;
-        rangeElement: Object;
-        rangeIndex: number;
-    }
-    //CircularGauge drawTicks Arugument
-    interface DrawTicksEventArgs {
-        object: Object;
-        cancel: boolean;
-        context: Object;
-        model: Object;
-        type: Object;
-        scaleElement: Object;
-        scaleIndex: number;
-        position: Object;
-        style: string;
-        tick: Object;
-        pointerValue: number;
-    }
-    //CircularGauge load Arugument
-    interface CircularGaugeLoadEventArgs {
-        object: Object;
-        cancel: boolean;
-        context: Object;
-        model: Object;
-        type: Object;
-        scaleElement: Object;
-        style: string;
-    }
-    //CircularGauge Arguments Options
-    interface CircularGaugeMousePointerOption {
-        index: number;
-        element: Object;
-        value: number;
-        angle: number;
-    }
-    //#endregion CircularGauge
-
-
-    //#region DigitalGauge
-    class DigitalGauge extends EJ.Core.Widget {
-        static fn: DigitalGauge;
-        element: JQuery;
-        constructor(element: JQuery, options?: DigitalGaugeOptions);
-        model: Object;
-        defaults: DigitalGaugeOptions;
-        setValue(itemIndex: number, value: string): void;
-        getValue(itemIndex: number): void;
-        setPosition(itemIndex: number, value: Object): void;
-        getPosition(itemIndex: number): void;
-        exportImage(fileName: string, fileType: string): void;
-        refresh(): void;
-        destroy(): void;
-    }
-    interface DigitalGaugeOptions {
-        segmentData?: Object;
-        matrixSegmentData?: Object;
-        frame?: DigitalGaugeFrameOptions;
-        height?: number;
-        width?: number;
-        enableResize?: boolean;
-        theme?: string;
-        items?: DigitalGaugeItemsOptions;
-        value?: string;
-        init? (e: DigitalGaugeEventArgs): void;
-        load? (e: DigitalGaugeEventArgs): void;
-        renderComplete? (e: DigitalGaugeEventArgs): void;
-        itemRendering? (e: DigitalGaugeEventArgs): void;
-    }
-    interface DigitalGaugeFrameOptions {
-        backgroundImageUrl?: string;
-        innerWidth?: number;
-        outerWidth?: number;
-    }
-    interface DigitalGaugeItemsOptions {
-        characterSettings?: DigitalGaugeCharacterSettingsOptions;
-        enableCustomFont?: boolean;
-        segmentSettings?: DigitalGaugeSegmentSettingsOptions;
-        shadowBlur?: number;
-        shadowOffsetX?: number;
-        shadowOffsetY?: number;
-        textAlign?: string;
-        font?: DigitalGaugeFontOptions;
-        position?: DigitalGaugePositionOptions;
-        shadowColor?: string;
-        textColor?: string;
-        value?: string;
-    }
-    interface DigitalGaugeCharacterSettingsOptions {
-        count?: number;
-        opacity?: number;
-        spacing?: number;
-        type?: string;
-    }
-    interface DigitalGaugeSegmentSettingsOptions {
-        color?: number;
-        gradient?: number;
-        length?: number;
-        opacity?: number;
-        spacing?: number;
-        width?: number;
-    }
-    interface DigitalGaugeFontOptions {
-        size?: string;
-        fontFamily?: string;
-        fontStyle?: string;
-    }
-    interface DigitalGaugePositionOptions {
-        x?: number;
-        y?: number;
-    }
-    interface DigitalGaugeEventArgs {
-        object: Object;
-        cancel: boolean;
-        items: Object;
-        context: Object;
-        model: Object;
-        type: string;
-    }
-    //Enum for DigitalGauge CharacterType
-    enum CharacterType {
-        SevenSegment,
-        FourteenSegment,
-        SixteenSegment,
-        EightCrossEightDotMatrix,
-        EightCrossEightSquareMatrix
-    }
-    //Enum for DigitalGauge FontStyle
-    enum FontStyle {
-        Normal,
-        Bold,
-        Italic,
-        Underline,
-        Strikeout
-    }
-    //Enum for DigitalGauge TextAlignment
-    enum TextAlignment {
-        Left,
-        Right
-    }
-    //Enum for DigitalGauge Themes
-    enum Themes {
-        flatlight,
-        flatdark
-    }
-    //#endregion DigitalGauge
-    
-    class Chart extends EJ.Core.Widget {
-        static fn: Chart;
-        constructor(element: JQuery, options?: ChartOptions);
-        defaults: ChartOptions;
-        redraw(): void;
-        destroy(): void;
-    }
-
-    interface ChartOptions {
-        border?: ChartBorder;
-        background?: string;
-        chartArea?: { border?: ChartBorder; background?: string };
-        primaryXAxis?: Axis;
-        primaryYAxis?: Axis;
-        axes?: Array<Axis>;
-        crosshair?: { marker?: Marker; visible?: boolean; type?: string };
-        commonSeriesOptions?: Series;
-        series?: Array<Series>;
-        initSeriesRender?: boolean;
-        theme?: string;
-        canResize?: boolean;
-        zooming?: { enable?: boolean; type?: string; enableMouseWheel?: boolean };
-        legend?: { visible?: boolean; position?: string; alignmnet?: string; border?: Border; itemPadding?: number; shape?: string; location?: { x?: number; y?: Number }; itemStyle?: { height?: number; width?: number; border?: Border; rowCount?: number; columnCount?: number; fill?: string; font?: Font } }
-        locale?: string;
-        size?: { width?: string; height?: string };
-        margin?: Margin;
-        title?: { text?: string; font?: Font; textAlignment?: string };
-        rowDefinitions?: Array<RowDefinition>;
-        columnDefinition?: Array<ColumnDefinition>;
-        load? (e: ChartEvent): void;
-        axesLabelRendering? (e: ChartEvent): void;
-        axesRangeCalculate? (e: ChartEvent): void;
-        axesTitleRendering? (e: ChartEvent): void;
-        chartAreaBoundsCalculate? (e: ChartEvent): void;
-        legendItemRendering? (e: ChartEvent): void;
-        legendBoundsCalculate? (e: ChartEvent): void;
-        preRender? (e: ChartEvent): void;
-        seriesRendering? (e: ChartEvent): void;
-        symbolRendering? (e: ChartEvent): void;
-        titleRendering? (e: ChartEvent): void;
-        axesLabelsInitialize? (e: ChartEvent): void;
-        pointRegionClick? (e: ChartEvent): void;
-        pointRegionMouseMove? (e: ChartEvent): void;
-        legendItemClick? (e: ChartEvent): void;
-        legendItemMouseMove? (e: ChartEvent): void;
-        displayTextRendering? (e: ChartEvent): void;
-        toolTipInitialize? (e: ChartEvent): void;
-        trackAxisToolTip? (e: ChartEvent): void;
-        trackToolTip? (e: ChartEvent): void;
-        destroy? (e: ChartEvent): void;
-        create? (e: ChartEvent): void;
-    }
-
-    interface ChartBorder {
-        color?: string;
-        width?: number;
-        opacity?: number;
-    }
-
-    interface Border {
-        color?: string;
-        width?: number;
-    }
-
-    interface Axis {
-        majorGridLines?: { width?: number; dashArray?: string; visible?: boolean; opacity?: number };
-        minorGridLines?: { width?: number; dashArray?: string; visible?: boolean };
-        minorTickLines?: { width?: number; size?: number; visible?: boolean };
-        majorTickLines?: { width?: number; size?: number; visible?: boolean };
-        minorTicksPerInterval?: number;
-        columnIndex?: number;
-        columnSpan?: number;
-        rowIndex?: number;
-        rowSpan?: number;
-        labelRotation?: number;
-        valueType?: string;
-        name?: string;
-        labelFormat?: string;
-        desiredIntervals?: number;
-        intervalType?: string;
-        roundingPlaces?: number;
-        logBase?: number;
-        plotOffset?: number;
-        stripLine?: Array<StripLines>;
-        title?: Title;
-        rangePadding?: string;
-        orientation?: string;
-        maximumLabels?: number;
-        opposedPosition?: boolean;
-        axisLine?: { visible?: boolean; width?: number; dashArray?: string; offset?: number };
-        labelIntersectAction?: string;
-        edgeLabelPlacement?: string;
-        font?: Font;
-        visible?: boolean;
-        crosshairLabel?: { visible?: boolean; font?: Font; rx?: number; ry?: number; fill?: string; border?: Border };
-        zoomFactor?: number;
-        zoomPosition?: number;
-
-    }
-
-    interface Series {
-        points?: Array<Point>;
-        marker?: Marker;
-        tooltip?: { visible?: boolean; format?: string; template?: string; enableAnimation?: boolean; duration?: string; font?: Font; border?: Border; rx?: number; ry?: number; fill?: string };
-        font?: Font;
-        labelPosition?: string;
-        type?: string;
-        visibility?: boolean;
-        name?: string;
-        yAxisName?: string;
-        xAxisName?: string;
-        pyramidMode?: string;
-        gapRatio?: number;
-        doughnutSize?: number;
-        pieCoefficient?: number;
-        doughnutCoefficient?: number;
-        explodeOffset?: number;
-        startAngle?: number;
-        explodeIndex?: number;
-        enableAnimation?: boolean;
-        explodeAll?: boolean;
-        drawMode?: string;
-        bullFillColor?: string;
-        bearFillColor?: string;
-        smartLabelEnabled?: boolean;
-        explode?: boolean;
-        border?: Border;
-        dashArray?: string;
-        lineJoin?: string;
-        lineCap?: string;
-        width?: number;
-        opacity?: number;
-        fill?: string;
-        dataSource?: any;
-        xName?: string;
-        yName?: string;
-        query?: string;
-    }
-
-    interface Point {
-        x?: any;
-        y?: number;
-        high?: number;
-        low?: number;
-        open?: number;
-        close?: number;
-        size?: number;
-        visible?: boolean;
-        isEmpty?: boolean;
-        interior?: string;
-        text?: string;
-        offset?: number;
-        font?: Font;
-        fill?: string;
-        opacity?: number;
-        border?: Border;
-        width?: number;
-        marker?: Marker
-    }
-
-    interface StripLines {
-        visible?: boolean;
-        startFromAxis?: boolean;
-        text?: string;
-        textAlignment?: string;
-        font?: Font;
-        start?: number;
-        end?: number;
-        color?: string;
-        borderColor?: string;
-        zIndex?: string;
-        borderWidth?: number;
-    }
-
-    interface RowDefinition {
-        rowHeight?: number;
-        lineWidth?: number;
-        lineColor?: string;
-        unit?: string
-    }
-
-    interface ColumnDefinition {
-        columnWidth?: number;
-        unit?: string
-    }
-
-    interface Font {
-        fontFamily?: string;
-        fontStyle?: string;
-        size?: string;
-        color?: string;
-        opacity?: number;
-    }
-
-    interface Title {
-        text?: string;
-        font?: Font;
-    }
-
-    interface Marker {
-        visible?: boolean;
-        size?: { width?: number; height?: number };
-        opacity?: number;
-        shape?: string;
-        dataLabel?: DataLabel;
-        border?: { width?: number; color?: string };
-    }
-
-    interface DataLabel {
-        textPosition?: string;
-        horizontalTextAlignment?: string;
-        verticalTextAlignment?: string;
-        visible?: boolean;
-        offset?: number;
-        template?: string;
-        font?: Font;
-        shape?: string;
-        connectorLine?: { color?: string; width?: number; connectorType?: string };
-        margin?: Margin;
-        border?: Border;
-        fill?: string;
-        opacity?: number;
-    }
-
-    interface Margin {
-        left?: number;
-        right?: number;
-        top?: number;
-        bottom?: number;
-    }
-
-    interface ChartEvent {
-        cancel: boolean;
-        type: string;
-        model: ChartOptions;
-    }
-
-    class RangeNavigator extends EJ.Core.Widget {
-        static fn: RangeNavigator;
-        constructor(element: JQuery, options?: RangeNavigatorOptions);
-        defaults: RangeNavigatorOptions;
-        renderNavigator(): void;
-    }
-    interface RangeNavigatorOptions {
-        theme?: string;
-        padding?: string;
-        enableAutoResizing?: boolean;
-        allowSnapping?: boolean;
-        rangePadding?: string;
-        sizeSettings?: { width?: string; height?: string };
-        locale?: string;
-        valueType?: string;
-        valueAxisSettings?: { rangePadding?: string; visible?: boolean; axisLine: { visible?: boolean }; font: { size?: string }; majorTickLines: { width?: number; size?: number; visible?: boolean }; majorGridLines: { visible?: boolean } }
-        enableRTL?: boolean;
-        dataSource?: any;
-        xName?: string;
-        yName?: string;
-        tooltipSettings?: { visible?: boolean; labelFormat?: string; tooltipDisplayMode?: string; backgroundColor?: string; font?: RangeFont };
-        zoomPosition?: string;
-        zoomFactor?: string;
-        selectedRangeSettings?: { start?: string; end?: string };
-        selectedData?: string;
-        rangeSettings?: { start?: string; end?: string };
-        series?: Array<Series>;
-        enableDeferredUpdate?: boolean;
-        seriesSettings?: { type?: string; animation?: boolean };
-        labelSettings?: { higherLevel?: Labels; lowerLevel?: Labels; style?: { font?: RangeFont; horizontalAlignment?: string} };
-        navigatorStyleSettings?: { selectedRegionColor?: string; unselectedRegionColor?: string; thumbColor?: string; thumbRadius?: number; thumbStroke?: string; background?: string; border?: { width?: number; stroke?: string; dashArray?: string }; opacity?: number; majorGridLineStyle?: { visible?: boolean; color?: string }; minorGridLineStyle?: { visible?: boolean; color?: string } };
-        loaded? (e: RangeNavigatorEvent): void;
-        load? (e: RangeNavigatorEvent): void;
-        rangeChanged? (e: RangeNavigatorEvent): void;
-    }
-
-    interface Labels {
-        intervalType?: string;
-        style?: { font?: RangeFont; horizontalAlignment?: string };
-        gridLineStyle?: { color?: string; width?: number; stroke?: string; dashArray?:string};
-        border?: Border;
-        fill?: string;
-        position?: string;
-        visible?: boolean;
-        labelPosition?: string;
-    }
-
-    interface RangeFont {
-        family?: string;
-        style?: string;
-        weight?: string;
-        size?: string;
-        color?: string;
-        opacity?: number;
-    }
-
-    interface RangeNavigatorEvent {
-        cancel: boolean;
-        type: string;
-        model: RangeNavigatorOptions;
-    }
-
-    class BulletGraph extends EJ.Core.Widget {
-        static fn: BulletGraph;
-        constructor(element: JQuery, options?: BulletGraphOptions);
-        defaults: BulletGraphOptions;
-        redraw(): void;
-        destroy(): void;
-        setFeatureMeasureBarValue(index, measureValue): void;
-        setComparativeMeasureSymbol(index, measureValue): void;
-    }
-
-    interface BulletGraphOptions {
-        value?: number;
-        comparativeMeasureValue?: number;
-        width?: number;
-        height?: number;
-        theme?: string;
-        orientation?: string;
-        flowDirection?: string;
-        qualitativeRangeSize?: number;
-        quantitativeScaleLength?: number;
-        tooltipSettings?: { visible?: boolean; template?: string };
-        quantitativeScaleSettings?: QuantitativeScale;
-        fields?: { dataSource?: any; query?: string; tableName?: string; category?: string; featureMeasures?: string; comparativeMeasure?: string; };
-        enableAnimation?: boolean;
-        enableResizing?: boolean;
-        applyRangeStrokeToTicks?: boolean;
-        applyRangeStrokeToLabels?: boolean;
-        qualitativeRanges?: Array<{ rangeEnd?: number; rangeStroke?: number; rangeOpacity?: number }>;
-        captionSettings?: { textAngle?: number; location?: { x?: number; y?: number }; text?: string; font?: Font; subTitle?: { textAngle?: number; location?: { x?: number; y?: number }; text?: string; font?: Font } }
-        drawTicks? (e: BulletGraphEvent): void;
-        drawLabels? (e: BulletGraphEvent): void;
-        drawCaption? (e: BulletGraphEvent): void;
-        drawQualitativeRanges? (e: BulletGraphEvent): void;
-        drawFeatureMeasureBar? (e: BulletGraphEvent): void;
-        drawCategory? (e: BulletGraphEvent): void;
-        drawComparativeMeasureSymbol? (e: BulletGraphEvent): void;
-    }
-
-    interface QuantitativeScale {
-        location?: { x?: number; y?: number };
-        minimum?: number;
-        maximum?: number;
-        interval?: number;
-        minorTicksPerInterval?: number;
-        majorTickSettings?: { size?: number; stroke?: number; width?: number };
-        minorTickSettings?: { size?: number; stroke?: number; width?: number; };
-        tickPosition?: string;
-        labelSettings?: { stroke?: string; size?: number; offset?: number; font?: Font; position?:string};
-        labelPosition?: string;
-        featuredMeasureSettings?: { stroke?: number; width?: number };
-        comparativeMeasureSettings?: { stroke?: number; width?: number };
-        featureMeasures?: Array<{ value?: number; comparativeMeasureValue?: number; category?: string }>;
-    }
-
-    interface BulletGraphEvent {
-        cancel: boolean;
-        type: string;
-        model: BulletGraphOptions;
-    }
-
-    class Barcode extends EJ.Core.Widget {
-        static fn: Barcode;
-        constructor(element: JQuery, options?: BarcodeOptions);
-        defaults: BarcodeOptions;
-    }
-
-    interface BarcodeOptions {
-        displayText?: boolean;
-        text?: string;
-        symbologyType?: SymbologyType;
-        textColor?: string;
-        lightBarColor?: string;
-        darkBarColor?: string;
-        narrowBarWidth?: number;
-        wideBarWidth?: number;
-        barHeight?: number;
-        barcodeToTextGapHeight?: number;
-        xDimension?: number;
-        encodeStartStopSymbol?: boolean;
-        enabled?: boolean;
-        load? (e: BarcodeEvent): void;
-    }
-
-    interface BarcodeEvent {
-        cancel: boolean;
-        type: string;
-        model: BarcodeOptions;
-    }
-
-    enum SymbologyType {
-        code39,
-        code39Extended,
-        code11,
-        codabar,
-        code32,
-        code93,
-        code93Extended,
-        code128A,
-        code128B,
-        code128C,
-        dataMatrix,
-        qrBarcode
-    }
-	
-	 class Map extends EJ.Core.Widget {
-        static fn: Map;
-        constructor(element?: JQuery, options?: MapOptions);
-        constructor(element?: Element, options?: MapOptions);
-        model: Object;
-        defaults: MapOptions;
-        navigateTo(latitude:number, longitude:number, level:number): void;
-        pan(direction:string): void;
-        refresh(): void;
-        refreshLayers(): void;
-        refreshNavigationControl(navigation): void;
-        zoom(level:number, isAnimate:boolean): void;
-    }
-
-    interface MapOptions {
-        enablePan?: boolean;
-        baseMapIndex?: number;
-        enableAnimation?: boolean;
-        layers?: Array<ShapeLayer>;
-        zoomSettings?: ZoomSettings;
-        background?: string;
-        enableResize?: boolean;
-        enableLayerChangeAnimation?: boolean;
-        navigationControl?: NavigationControl;
-        dataSource?: any;
-        centerPosition?: ShapePoint;
-        zoomedIn? (e:MapZoomEvent): void;
-		zoomedOut? (e:MapZoomEvent): void;
-		panned? (e:MapEvent): void;
-		shapeSelected? (e:MapSelectEvent): void;
-		onRenderComplete? (e:MapRenderCompleteEvent): void;
-		mouseover? (e:MapShapeMouseEvent): void;
-		mouseleave? (e:MapShapeMouseEvent): void;
-		markerSelected? (e:MapSelectEvent): void;
-    }
-
-    interface ZoomSettings {
-        minValue?: number;
-        maxValue?: number;
-        factor?: number;
-        level?: number;
-        enableZoomOnSelection?: boolean;
-        enableZoom?: boolean;
-    }
-
-    interface BubbleSetting {
-        minValue?: number;
-        maxValue?: number;
-        color?: string;
-        colorValuePath?: string;
-        valuePath?: string;
-        tooltipTemplate?: string;
-        colorMappings?: ColorMapping;
-        showToolTip?: boolean
-    }
-
-    interface ColorMapping {
-        color?: string;
-    }
-
-    interface RangeColorMapping extends ColorMapping {
-        from?: number;
-        to?: number;
-        gradientColors?: Array<string>;
-        legendLabel?: string;
-    }
-
-    interface EqualColorMapping extends ColorMapping {
-        value?: any;
-    }
-
-    interface MapLabelSetting {
-        showLabels?: boolean;
-        enableSmartLabel?: boolean;
-        labelPath?: string;
-        smartLabelSize?: string;
-        labelLength?: number;
-    }
-
-    interface MapLegendSetting {
-        showLegend?: boolean;
-        positionX?: number;
-        positionY?: number;
-        width?: number;
-        height?: number;
-        type?: string;
-        title?: string;
-        leftLabel?: string;
-        rightLabel?: string;
-        icon?: string;
-        mode?: string;
-        position?: string;
-    }
-
-    interface MapAnnotation {
-        label?: string;
-        labelFontSize?: number;
-        labelForeground?: string;
-        latitude?: number;
-        longitude?: number;
-    }
-
-    enum DockPosition {
-        None,
-        TopLeft,
-        TopCenter,
-        TopRight,
-        CenterLeft,
-        Center,
-        CenterRight,
-        Bottomleft,
-        BottomCenter,
-        BottomRight
-    }
-
-    enum LegendIcons {
-        Rectangle,
-        Circle
-    }
-
-    enum LabelSize {
-        Fixed,
-        Default
-    }
-
-    enum mode {
-        Default,
-        Interactive
-    }
-
-    enum LayerType {
-        Geometry,
-        OSM,
-        Bing
-    }
-
-    enum SelectionMode {
-        Default,
-        Multiple
-    }
-
-    enum Orientation {
-        Vertical,
-        horizontal
-    }
-
-    enum ColorPalette {
-        Palette1,
-        Palette2,
-        Palette3,
-        Palette4
-    }
-
-    interface NavigationControl {
-        enableNavigation?: boolean;
-        orientation?: string;
-        dockPosition?: string;
-        absolutePosition?: ShapePoint;
-    }
-
-    interface ShapeSetting {
-        highlightColor?: string;
-        highlightBorderWidth?: number;
-        selectionColor?: string;
-        fill?: string;
-        strokeThickness?: number;
-        selectionStrokeWidth?: number;
-        stroke?: string;
-        selectionStroke?: string;
-        highlightStroke?: string;
-        colorValuePath?: string;
-        valuePath?: string;
-        colorMappings?: ColorMapping
-		autoFill?: boolean;
-        enableGradient?: boolean;
-        colorPalette?: string;
-    }
-
-    interface MapMarkers {
-        mapMarker?: MapMarkers
-    }
-
-    interface ShapePoint {
-        X?: number;
-        Y?: number;
-    }
-
-    interface ShapeLayer {
-        enableSelection?: boolean;
-        selectionMode?: string;
-        enableMouseHover?: boolean;
-        showToolTip?: boolean;
-        enableAnimation?: boolean;
-        showMapItems?: boolean;
-        shapeData?: any;
-        dataSource?: any;
-        markerTemplate?: string;
-        tooltipTemplate?: string;
-        mapItemsTemplate?: string;
-        shapePropertyPath?: string;
-        shapeDataPath?: string;
-        markers?: Array<MapMarkers>;
-        subLayers?: Array<ShapeLayer>;
-        shapeSettings?: ShapeSetting;
-        bubbleSettings?: BubbleSetting;
-        labelSettings?: MapLabelSetting;
-        urlTemplate?: string;
-        contribution?: string;
-        legendSettings?: MapLegendSetting;
-        layerType?: string;
-    }
-
-    interface MapEvent extends EJ.Core.BaseEvent {
-        model: MapOptions;
-    }
-
-    interface MapZoomEvent extends EJ.Core.BaseEvent, MapEvent {
-        data: any;
-    }
-    interface MapSelectEvent extends EJ.Core.BaseEvent, MapEvent {
-        data: any;
-    }
-    interface MapRenderCompleteEvent extends EJ.Core.BaseEvent, MapEvent {
-        data: any;
-    }
-    interface MapShapeMouseEvent extends EJ.Core.BaseEvent, MapEvent {
-        data: string;
-    }
-
-     class TreeMap extends EJ.Core.Widget {
-        static fn: TreeMap;
-        element: JQuery;
-        constructor(element?: Element, options?: TreeMapOptions);
-        constructor(element?: JQuery, options?: TreeMapOptions);
-        model: Object;
-        defaults: TreeMapOptions;
-        refresh(): void;
-    }
-
-    interface TreeMapOptions {
-        dataSource?: any;
-        colorValuePath?: string;
-        weightValuePath?: string;
-        treeMapItems?: any;
-        showLegend?: boolean;
-        enableResize?: boolean;
-        leafItemSettings?: LeafItemsSetting;
-        itemsLayoutMode?: string;
-        levels?: Array<TreeMapLevel>;
-        treeMapLegend?: TreeMapLegend;
-        highlightOnSelection?: boolean;
-        showTooltip?: boolean;
-        tooltipTemplate?: string;
-        highlightBorderThickness?: number;
-        highlightBorderBrush?: string;
-        rangeColorMapping?: Array<TreeMapRangeColorMapping>;
-        desaturationColorMapping?: TreeMapDesaturationColorMapping;
-        paletteColorMapping?: TreeMapPaletteColorMapping;
-        uniColorMapping?: TreeMapUniColorMapping;
-        treeMapItemSelected? (e: TreeMapSelectEvent): void;
-    }
-
-    interface TreeMapItem {
-    }
-
-    interface LeafItemsSetting {
-        GroupBorderThickness?: number;
-        GroupPadding?: number;
-        GroupBackground?: string;
-        GroupBorderColor?: string;
-        showLabels?: boolean;
-        headerTemplate?: string;
-        itemTemplate?: string;
-        groupBackground?: string;
-        groupBorderColor?: string;
-        groupBorderThickness?: number;
-        groupPadding?: number;
-        treeMapItems?: Array<TreeMapItem>;
-    }
-
-    interface TreeMapRangeColorMapping extends TreeMapPaletteColorMapping {
-        from?: number;
-        to?: number;
-        legendLabel?: string;
-    }
-
-    interface TreeMapDesaturationColorMapping extends TreeMapPaletteColorMapping {
-        from?: number;
-        to?: number;
-        rangeMinimum?: number;
-        rangeMaximum?: number;
-    }
-
-    interface TreeMapUniColorMapping extends TreeMapPaletteColorMapping {
-        color?: string;
-    }
-
-    interface TreeMapPaletteColorMapping {
-        colors?: Array<string>;
-    }
-
-    interface TreeMapLegend {
-        template?: string;
-        iconHeight?: number;
-        iconWidth?: number;
-    }
-
-    interface TreeMapLevel {
-        itemsLayoutMode?: string;
-        groupPath?: string;
-        groupGap?: number;
-        headerHeight?: number;
-        showLabels?: boolean;
-        headerTemplate?: string;
-        labelTemplate?: string;
-        groupBackground?: string;
-        groupBorderColor?: string;
-        groupBorderThickness?: number;
-        groupPadding?: number;
-        treeMapItems?: Array<TreeMapItem>;
-    }
-
-    interface TreeMapEvent extends EJ.Core.BaseEvent {
-        model: TreeMapOptions;
-    }
-    interface TreeMapSelectEvent extends EJ.Core.BaseEvent, TreeMapEvent {
-        data: any;
-    }
-	 
-    //SymbolPalette
-    class SymbolPalette extends EJ.Core.Widget {
-        static fn: SymbolPalette;
-        element: JQuery;
-        constructor(element: Element, options?: SymbolPaletteOptions);
-        model: Object;
-        validTags: Array<string>;
-        defaults: SymbolPaletteOptions;
-        disable(): void;
-        enable(): void;
-        destroy(): void;
-    }
-
-    interface SymbolPaletteOptions {
-        width?: string;
-        height?: string;
-        paletteItemWidth?: number;
-        paletteItemHeight?: number;
-        previewWidth?: number;
-        previewHeight?: number;
-        previewX?: number;
-        previewY?: number;
-        diagramId?: string;
-        headerHeight?: number;
-        selectedPaletteIndex?: number;
-        cssClass?: string;
-        showPaletteItemText?: boolean;
-        allowDrag?: boolean;
-        palettes?: Array<Object>;
-    }
-
-    //Diagram
-    class Diagram extends EJ.Core.Widget {
-        static fn: Diagram;
-        element: JQuery;
-        constructor(element: Element, options?: DiagramOptions);
-        model: Object;
-        validTags: Array<string>;
-        defaults: DiagramOptions;
-        disable(): void;
-        enable(): void;
-        destroy(): void;
-    }
-
-    interface DiagramOptions {
-        width?: string;
-        height?: string;
-        nodes?: Array<Object>;
-        connectors?: Array<Object>;
-        dataSource?: Array<Object>;
-        connectorDefaults?: Object;
-        nodeDefaults?: Object;
-        nodeTemplate? (e: TemplateFunction): Object;
-        snapSettings?: SnapSettingsOption;
-        pageSettings?: PageSettingsOption;
-        contextMenu?: ContextMenuOption;
-        enableContextMenu?: boolean;
-        enableAutoScroll?: boolean;
-        showTooltip?: boolean;
-        tooltipTemplateId?: string;
-        autoScrollMargin?: number;
-        layout?: LayoutOptions;
-        userHandles?: Array<Object>;
-        drawingTools?: Array<Object>;
-        backgroundImage?: string;
-        selectorConstraints?: SelectorConstraintsOption;
-        zoomFactor?: number;
-        nodeCollectionChange? (e: NodeCollectionChangeEvent): void;
-        connectorCollectionChange? (e: ConnectorCollectionChangeEvent): void;
-        selectionChange? (e: SelectionChangeEvent): void;
-        mouseLeave? (e: MouseEvent): void;
-        mouseEnter? (e: MouseEvent): void;
-        mouseHover? (e: MouseEvent): void;
-        click? (e: clickEvent): void;
-        doubleClick? (e: DoubleclickEvent): void;
-        drop? (e: DropEvent): void;
-        drag? (e: DragEvent): void;
-        textChange? (e: TextChangeEvent): void;
-        sizeChange? (e: SizeChangeEvent): void;
-        connectionChange? (e: ConnectionChangeEvent): void;
-        rotationChange? (e: RotationChangeEvent): void;
-    }
-
-    interface TemplateFunction {
-        option: Object;
-    }
-
-    interface MouseEvent {
-        cancel?: boolean;
-        element?: Object;
-        type?: string;
-    }
-
-    interface ConnectionChangeEvent {
-        cancel?: boolean;
-        connection?: Object;
-        element?: Object;
-        endPoint?: string;
-        port?: Object;
-        type?: string;
-    }
-
-    interface RotationChangeEvent {
-        cancel?: boolean;
-        element?: Object;
-        type?: string;
-    }
-
-    interface SizeChangeEvent {
-        cancel?: boolean;
-        element?: Object;
-        offset?: SizeChangeOffsetOption;
-        type?: string;
-    }
-
-    interface SizeChangeOffsetOption {
-        height?: number;
-        width?: number;
-    }
-
-    interface TextChangeEvent {
-        cancel?: boolean;
-        element?: Object;
-        type?: string;
-        value?: string;
-    }
-
-
-    interface DragEvent {
-        cancel?: boolean;
-        element?: Object;
-        offset?: DragOffsetOption;
-        type?: string;
-    }
-
-    interface DragOffsetOption {
-        x?: number;
-        y?: number;
-    }
-
-    interface DropEvent {
-        cancel?: boolean;
-        element?: Object;
-        type?: string;
-    }
-
-    interface ConnectorCollectionChangeEvent {
-        cancel?: boolean;
-        changeType?: string;
-        element?: Object;
-        type?: string;
-    }
-
-    interface NodeCollectionChangeEvent {
-        cancel?: boolean;
-        changeType?: string;
-        element?: Object;
-        type?: string;
-    }
-
-    interface SelectionChangeEvent {
-        cancel?: boolean;
-        changeType?: string;
-        element?: Array<Object>;
-        type?: string;
-    }
-
-    interface beforeContextOpenEvent {
-        cancel?: boolean;
-        type?: string;
-        diagram?: Object;
-        contextmenu?: Object;
-    }
-
-    interface clickEvent {
-        cancel?: boolean;
-        type?: string;
-        element?: Object;
-    }
-
-    interface DoubleclickEvent {
-        cancel?: boolean;
-        type?: string;
-        element?: Object;
-    }
-
-    enum SelectorConstraintsOption {
-        Rotator,
-        Resizer,
-        UserHandles
-    }
-
-    interface LayoutOptions {
-        type?: string;
-        orientation?: string;
-        horizontalSpacing?: number;
-        verticalSpacing?: number;
-        marginX?: number;
-        marginY?: number;
-        fixedNode?: string;
-    }
-
-    interface ContextMenuOption {
-        items?: Array<Object>;
-        click? (e: ContextclickEvent): void;
-        beforeOpen? (e: beforeContextOpenEvent): void;
-        showCustomMenuItemsOnly?: boolean;
-    }
-
-    interface ContextclickEvent {
-        cancel?: boolean;
-        type?: string;
-        Events?: Object;
-
-    }
-
-    interface PageSettingsOption {
-        pageWidth?: number;
-        pageHeight?: number;
-        multiplePage?: boolean;
-        pageBorderWidth?: number;
-        pageBackgroundColor?: string;
-        pageBorderColor?: string;
-        pageMargin?: number;
-        showPageBreak?: boolean;
-        pageOrientation?: string;
-    }
-
-    interface SnapSettingsOption {
-        horizontalGridLines?: HorizontalGridLinesOptions;
-        verticalGridLines?: VerticalGridLinesOptions;
-        snapConstraints?: SnapConstraintsOptions;
-        enableSnapToObject?: boolean;
-        snapAngle?: number;
-        snapObjectDistance?: number;
-    }
-
-    interface HorizontalGridLinesOptions {
-        linesInterval?: Array<string>;
-        snapInterval?: Array<string>;
-        lineDashArray?: string;
-        lineColor?: string;
-    }
-
-    interface VerticalGridLinesOptions {
-        linesInterval?: Array<string>;
-        snapInterval?: Array<string>;
-        lineDashArray?: string;
-        lineColor?: string;
-    }
-
-    enum SnapConstraintsOptions {
-        None,
-        SnapToHorizontalLines,
-        SnapToVerticalLines,
-        SnapToLines, 
-        ShowHorizontalLines,
-        ShowVerticalLines,
-        ShowLines,
-        All
-    }
-    module Diagram {
-        function Point(x?: number, y?: number): Object;
-        function Size(width?: number, height?: number): Object;
-        function Rectangle(x?: number, y?: number, width?: number, height?: number): Object;
-        function Node(options?: Object): Object;
-        function Connector(options?: Object): Object;
-        function Group(options?: Object): Object;
-        function Port(options?: Object): Object;
-        function Label(options?: Object): Object;
-        function Shape(options?: Object): Object;
-        function Line(options?: Object): Object;
-        function TextBlock(options?: Object): Object;
-        function Decorator(options?: Object): Object;
-        function Margin(options?: Object): Object;
-        function Stop(options?: Object): Object;
-        function LinearGradient(options?: Object): Object;
-        function RadialGradient(options?: Object): Object;
-        function Zoom(options?: Object): Object;
-        function UserHandle(options?: Object): Object;
-        function Palette(options?: Object): Object;
-
-        var Util: {
-            randomId();
-        }
-
-    var SelectorConstraints: {
-            None;
-            Rotator;
-            Resizer;
-            UserHandles;
-            All;
-        }
-
-    var SnapConstraints: {
-            None;
-            SnapToHorizontalLines;
-            SnapToVerticalLines;
-            SnapToLines;
-            ShowHorizontalLines;
-            ShowVerticalLines;
-            ShowLines;
-            All;
-        }
-
-    var NodeConstraints: {
-            Drag;
-            Rotate;
-            Select;
-            Delete;
-            Resize;
-            Connect;
-            None;
-        }
-
-    var ConnectorConstraints: {
-            Drag;
-            Rotate;
-            Select;
-            Delete;
-            DragSourceEnd;
-            DragTargetEnd;
-            DragSegmentThumb;
-            None;
-        }
-
-    var PortConstraints: {
-            Connect;
-            None;
-        }
-
-}
-}
-
-interface JQuery {
-   ejButton(): JQuery;
-    ejButton(options?: ej.ButtonOptions): JQuery;
-
-    ejAccordion(): JQuery;
-    ejAccordion(options?: ej.AccordionOptions): JQuery;
-
-    ejAutocomplete(): JQuery;
-    ejAutocomplete(options?: ej.AutocompleteOptions): JQuery;
-
-    ejDatePicker(): JQuery;
-    ejDatePicker(options?: ej.DatePickerOptions): JQuery;
-
-    ejDateTimePicker(): JQuery;
-    ejDateTimePicker(options?: ej.DateTimePickerOptions): JQuery;
-
-    ejDialog(): JQuery;
-    ejDialog(options?: ej.DialogOptions): JQuery;
-
-
-    ejDropDownList(): JQuery;
-    ejDropDownList(options?: ej.DropDownListOptions): JQuery;
-
-
-    ejNumericTextbox(): JQuery;
-    ejNumericTextbox(options?: ej.EditorOptions): JQuery;
-
-    ejCurrencyTextbox(): JQuery;
-    ejCurrencyTextbox(options?: ej.EditorOptions): JQuery;
-
-    ejPercentageTextbox(): JQuery;
-    ejPercentageTextbox(options?: ej.EditorOptions): JQuery;
-
-    ejMaskEdit(): JQuery;
-    ejMaskEdit(options?: ej.MaskEditOptions): JQuery;
-
-    ejMenu(): JQuery;
-    ejMenu(options?: ej.MenuOptions): JQuery;
-
-    ejPager(): JQuery;
-    ejPager(options?: ej.PagerOptions): JQuery;
-
-
-    ejProgressBar(): JQuery;
-    ejProgressBar(options?: ej.ProgressBarOptions): JQuery;
-
-
-    ejRadioButton(): JQuery;
-    ejRadioButton(options?: ej.RadioButtonOptions): JQuery;
-
-	 ejCheckBox(): JQuery;
-    ejCheckBox(options?: ej.CheckBoxOptions): JQuery;
-	
-    ejRating(): JQuery;
-    ejRating(options?: ej.RatingOptions): JQuery;
-
-    ejRotator(): JQuery;
-    ejRotator(options?: ej.RotatorOptions): JQuery;
-
-    ejRTE(): JQuery;
-    ejRTE(options?: ej.RTEOptions): JQuery;
-
-    ejSlider(): JQuery;
-    ejSlider(options?: ej.SliderOptions): JQuery;
-
-    ejSplitButton(): JQuery;
-    ejSplitButton(options?: ej.SplitButtonOptions): JQuery;
-
-
-    ejSplitter(): JQuery;
-    ejSplitter(options?: ej.SplitterOptions): JQuery;
-
-
-    ejTab(): JQuery;
-    ejTab(options?: ej.TabOptions): JQuery;
-
-    ejTagCloud(): JQuery;
-    ejTagCloud(options?: ej.TagCloudOptions): JQuery;
-
-    ejTimePicker(): JQuery;
-    ejTimePicker(options?: ej.TimePickerOptions): JQuery;
-
-    ejToggleButton(): JQuery;
-    ejToggleButton(options?: ej.ToggleButtonOptions): JQuery;
-
-    ejToolbar(): JQuery;
-    ejToolbar(options?: ej.ToolbarOptions): JQuery;
-
-    ejTreeView(): JQuery;
-    ejTreeView(options?: ej.TreeViewOptions): JQuery;
-
-
-    ejUploadbox(): JQuery;
-    ejUploadbox(options?: ej.UploadboxOptions): JQuery;
-
-
-    ejWaitingPopup(): JQuery;
-    ejWaitingPopup(options?: ej.WaitingPopupOptions): JQuery;
-
-    ejSchedule(): JQuery;
-    ejSchedule(options?: ej.ScheduleOptions): JQuery;
-
-    ejGrid(): JQuery;
-    ejGrid(options?: ej.GridOptions): JQuery;
-
-    ejLinearGauge(): JQuery;
-    ejLinearGauge(options?: ej.datavisualization.LinearGaugeOptions): JQuery;
-
-    ejDigitalGauge(): JQuery;
-    ejDigitalGauge(options?: ej.datavisualization.DigitalGaugeOptions): JQuery;
-
-    ejCircularGauge(): JQuery;
-    ejCircularGauge(options?: ej.datavisualization.CircularGaugeOptions): JQuery;
-
-    ejChart(): JQuery;
-    ejChart(options?: ej.datavisualization.ChartOptions): JQuery;
-
-    ejRangeNavigator(): JQuery;
-    ejRangeNavigator(options?: ej.datavisualization.RangeNavigatorOptions): JQuery;
-
-    ejBulletGraph(): JQuery;
-    ejBulletGraph(options?: ej.datavisualization.BulletGraphOptions): JQuery;
-
-    ejGantt(): JQuery;
-    ejGantt(options?: ej.GanttOptions): JQuery;
-
-    ejTreeGrid(): JQuery;
-    ejTreeGrid(options?: ej.TreeGridOptions): JQuery;
-
-   
-
-    ejMap(): JQuery;
-    ejMap(options?: ej.datavisualization.MapOptions): JQuery;
-
-    ejTreeMap(): JQuery;
-    ejTreeMap(options?: ej.datavisualization.TreeMapOptions): JQuery;
- 
-
-    ejBarcode(): JQuery;
-    ejBarcode(options?: ej.datavisualization.Barcode): JQuery;
-
-    ejDiagram(): JQuery;
-    ejDiagram(options?: ej.datavisualization.DiagramOptions): JQuery;
-
-    ejSymbolPalette(): JQuery;
-    ejSymbolPalette(options?: ej.datavisualization.SymbolPaletteOptions): JQuery;
-
-    ejOlapChart(): JQuery;
-    ejOlapChart(options?: ej.olap.OlapChartOptions): JQuery;
-
-    ejOlapGrid(): JQuery;
-    ejOlapGrid(options?: ej.olap.OlapGridOptions): JQuery;
-
-    ejOlapClient(): JQuery;
-    ejOlapClient(options?: ej.olap.OlapClientOptions): JQuery;
-
-    ejOlapGauge(): JQuery;
-    ejOlapGauge(options?: ej.olap.OlapGaugeOptions): JQuery;
-
-    ejOlapPager(): JQuery;
-    ejOlapPager(options?: ej.olap.OlapPagerOptions): JQuery;
-
-    /*Accordion*/
-    ejmAccordion(): JQuery;
-    ejmAccordion(options?: ej.mobile.AccordionOptions): JQuery;
-    /*Accordion*/
-
-    /*AutoComplete*/
-    ejmAutocomplete(): JQuery;
-    ejmAutocomplete(options?: ej.mobile.AutocompleteOptions): JQuery;
-    /*AutoComplete*/
-
-    /*Button*/
-    ejmButton(): JQuery;
-    ejmButton(options?: ej.mobile.ButtonOptions): JQuery;
-
-    ejmActionlink(): JQuery;
-    ejmActionlink(options?: ej.mobile.ButtonOptions): JQuery;
-    /*Button*/
-
-    /* DatePicker */
-    ejmDatePicker(): JQuery;
-    ejmDatePicker(options?: ej.mobile.DatePickerOptions): JQuery;
-    /* DatePicker */
-
-    /*Editor*/
-    ejmNumeric(): JQuery;
-    ejmNumeric(options?: ej.mobile.EditorOptions): JQuery;
-    /*Editor*/
-
-    /* Grid Start */
-    ejmGrid(): JQuery;
-    ejmGrid(options?: ej.mobile.GridOptions): JQuery;
-    /* Grid End */
-
-    /*Header*/
-    ejmHeader(): JQuery;
-    ejmHeader(options?: ej.mobile.HeaderOptions): JQuery;
-    /*Header*/
-
-    /*ListBox*/
-    ejmListbox(): JQuery;
-    ejmListbox(options?: ej.mobile.ListboxOptions): JQuery;
-    /*ListBox*/
-
-    /*Menu*/
-    ejmMenu(options?: ej.mobile.MenuOptions): JQuery;
-    /*Menu*/
-
-    /* ProgressBar */
-    ejmProgress(): JQuery;
-    ejmProgress(options?: ej.mobile.ProgressOptions): JQuery;
-    /* ProgressBar */
-
-    /*Radio Button*/
-    ejmRadioButton(): JQuery;
-    ejmRadioButton(options?: ej.mobile.RadioButtonOptions): JQuery;
-    /*Radio Button*/
-
-    /*Rating*/
-    ejmRating(): JQuery;
-    ejmRating(options?: ej.mobile.RatingOptions);
-    /*Rating*/
-
-
-    /*Rotator*/
-    ejmRotator(): JQuery;
-    ejmRotator(options?: ej.mobile.RotatorOptions): JQuery;
-    /*Rotator*/
-
-    /*Slider*/
-    ejmSlider(): JQuery;
-    ejmSlider(options?: ej.mobile.SliderOptions): JQuery;
-    /*Slider*/
-
-    /* Tab */
-    ejmTab(): JQuery;
-    ejmTab(options?: ej.mobile.TabOptions): JQuery;
-    /* Tab */
-
-    /*Tile*/
-    ejmTile(): JQuery;
-    ejmTile(options?: ej.mobile.TileOptions): JQuery;
-    /*Tile*/
-
-    /* TimePicker */
-    ejmTimePicker(): JQuery;
-    ejmTimePicker(options?: ej.mobile.TimePickerOptions): JQuery;
-    /* TimePicker */
-
-    /*ToggleButton*/
-    ejmToggleButton(): JQuery;
-    ejmToggleButton(options?: ej.mobile.ToggleButtonOptions): JQuery;
-    /*ToggleButton*/
-
-    /*Toolbar*/
-    ejmToolbar(): JQuery;
-    ejmToolbar(options?: ej.mobile.ToolbarOptions): JQuery;
-    /*Toolbar*/
-
-    /*GroupButton*/
-    ejmGroupButton(): JQuery;
-    ejmGroupButton(options?: ej.mobile.GroupButtonOptions): JQuery;
-    /*GroupButton*/
-
-    /* SplitPane */
-    ejmSplitPane(): JQuery;
-    ejmSplitPane(options?: ej.mobile.SplitPaneOptions): JQuery;
-    /* SplitPane */
-
-    /* Dialog */
-    ejmDialog(): JQuery;
-    ejmDialog(options?: ej.mobile.DialogOptions): JQuery;
-    /* Dialog */
-
-    /* TextBox */
-    ejmTextBox(): JQuery;
-    ejmTextBox(options?: ej.mobile.TextBoxOptions): JQuery;
-    /* TextBox */
-
-    /* Password */
-    ejmPassword(): JQuery;
-    ejmPassword(options?: ej.mobile.TextBoxOptions): JQuery;
-    /* Password */
-
-    /* MaskEdit */
-    ejmMaskEdit(): JQuery;
-    ejmMaskEdit(options?: ej.mobile.MaskEditOptions): JQuery;
-    /* MaskEdit */
-
-    /* TextArea */
-    ejmTextArea(): JQuery;
-    ejmTextArea(options?: ej.mobile.TextBoxOptions): JQuery;
-    /* MaskEdit */
-
-    /* Footer */
-    ejmFooter(): JQuery;
-    ejmFooter(options?: ej.mobile.FooterOptions): JQuery;
-    /* Footer */
-
-    /* CheckBox */
-    ejmCheckBox(): JQuery;
-    ejmCheckBox(options?: ej.mobile.CheckBoxOptions): JQuery;
-    /* CheckBox */
-
-    /* ScrollPanel */
-    ejmScrollPanel(): JQuery;
-    ejmScrollPanel(options: ej.mobile.ScrollPanelOptions): JQuery;
-    /* ScrollPanel */
-}
-
-
+        enable(): void
