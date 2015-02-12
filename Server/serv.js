@@ -192,6 +192,7 @@ io.sockets.on('connection', function (socket) {
           }
         }
 
+        // Then the start
         var range = [parseInt(req.ms_start), parseInt(req.ms_end)];
         //}}} PARSE REQUEST
         //
@@ -244,6 +245,8 @@ io.sockets.on('connection', function (socket) {
         // SEND TO CLIENT }}}
 
         // If we are using the BWIM event gathering interface, then we are definitely getting the values as returned by that.
+        // Not sure if we might be able to integrate the weather into the information again (to ensure that its
+        // not going to break the system accordingly.
 
         // See if we need to get data from the database (because the level is lower than we have pre-binned)
         if (READ_FROM_MYSQL && req.bin_level < 6) { // TODO: magic

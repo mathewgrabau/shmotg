@@ -49,6 +49,28 @@ Date.prototype.toJSON = function (key) {
 // {{{ CONNECTION
 // CONNECTION }}}
 
+// Define these constants for ensuring that the timezone is properly done 
+// when querying the database stored in central time.
+var CDT_OFFSET = 5 * 60;    // The timezone offset for ensuring the value is properly specified.
+var CST_OFFSET = 6 * 60;    // The timezone offset during daylight savings time.
+
+function determineTimezoneCorrection(date) {
+  var dateString = date.toString(); // Ensuring that we are selecting the right time for the date.
+  
+
+  var correctOffset = 0;
+
+  if (dateString.search("DT") > 0) {
+    correctOffset = CDT_OFFSET; 
+  } else {
+    correctOffset = CST_OFFSET;
+  }
+
+  // Using this the central time offset for using in the UTC hours should work just fine.
+  return correctOffset;
+  
+}
+
 // {{{ PRIVATE FUNCTIONS
 function combineAndSortArraysOfDateValObjects (arr1, arr2) {
     // Add the objects from arr2 (array) to arr1 (array)
@@ -118,6 +140,7 @@ function combineWithoutDuplicates(arr1, arr2) {
 makeQuery = function(a, b, letter, sensorNumber, sensorType) {
   // @param   a   The milliseconds requested for the query
   // @param   b   The milliseconds corresponding to the end time.
+  // @param   letter  Used for formatting and sending the query results (in the older)
   // RETURNS: Object containing the following fields:
   // column - the name of the column to inspect.
   
@@ -177,7 +200,6 @@ makeQuery = function(a, b, letter, sensorNumber, sensorType) {
 
     // TODO there is probably some much different formatting needed here.
     // This only works when Time is a character (I would think)
-    
     if (whereClause != null) {
       // TODO we need to do some adapting for the Date/Time to be able to turn these into a 
       // date and time again.
@@ -203,7 +225,7 @@ makeQuery = function(a, b, letter, sensorNumber, sensorType) {
     }
 
     // table is actually the database name (not the table name)
-    // The table name is expressed above
+    // TODO this should really be changed to ensure that the values are attempting
     var table = "SPB_SHM_" + dtr.getFullYear() + "MM" + pad(dtr.getMonth() + 1);
         
     return {
@@ -310,6 +332,10 @@ var determineTableName = function (ms, sensorNumber) {
   } 
 };
 
+
+/**
+ *  Determine based on the start/end milliseconds amounts.
+ */
 var generateWhereClause = function (msStart, msEnd) {
   // Parameter validation
   if (msStart > msEnd) {
@@ -328,6 +354,7 @@ var generateWhereClause = function (msStart, msEnd) {
   if (start.getFullYear() == 2012) {
     // This is just the formatted results
   } else if (start.getFullYear() == 2013) {
+
       
   } else if (start.getFullYear() == 2014) {
     // Date is the integer
@@ -337,7 +364,10 @@ var generateWhereClause = function (msStart, msEnd) {
     var numeralDateStart;
     var numeralDateEnd;
 
+    // TODO perform the timezone offset adjustments.
 
+    // The format in the date is 20140901 (hence the different
+    // shift positions).
     var INT_DATE_YEAR_SHIFT = 10000;
     var INT_DATE_MONTH_SHIFT = 100;
     console.log(start);
@@ -353,13 +383,22 @@ var generateWhereClause = function (msStart, msEnd) {
 
 
     // To convert the seconds:
-    // Hours * 3600 + Minutes * 60 + Seconds + milliseconds / 1000
+    // In 2014 the format for the timestamps is actually the following:
+    // HHMMSS.fff
+    var FLOAT_TIME_HOUR_SHIFT = 10000;
+    var FLOAT_TIME_MINUTE_SHIFT = 100;
 
+    // Note: the SampleIndex is not too reliabled.
+    var numeralTimeStart = start.getHours() * FLOAT_TIME_HOUR_SHIFT
+      + start.getMinutes() * FLOAT_TIME_MINUTE_SHIFT 
+      + start.getSeconds() 
+      + start.getMilliseconds() / 1000.0;
+    var numeralTimeEnd = end.getHours() * FLOAT_TIME_HOUR_SHIFT 
+      + end.getMinutes() * FLOAT_TIME_MINUTE_SHIFT 
+      + end.getSeconds() 
+      + end.getMilliseconds() / 1000.0;
 
-    // NOTE: The floating conversion is okay (the database is expecting that anyways)
-    var numeralTimeStart = start.getHours() * 3600 + start.getMinutes() * 60 + start.getSeconds() + start.getMilliseconds() / 1000.0;
-    var numeralTimeEnd = end.getHours() * 3600 + end.getMinutes() * 60 + end.getSeconds() + end.getMilliseconds() / 1000.0;
-
+    // Then complete and return the proper clause here.
     clause += numeralTimeStart + " AND " + numeralTimeEnd + ");";
   }
 
@@ -395,7 +434,11 @@ dateAndSampleIndexStringToMilliseconds = function (dateStr, sampleIndex) {
 }
 
 
-// Parsing Time, Date, SampleIndex column
+/**
+ *  Parsing the Date, Time, and SampleIndex from the row that is returned.
+ *  @param  row The row from the database query result that is to be 
+ *              processed here now.
+ */
 millisecondsFromParts = function(row) {
   
   // These functions aid in the implementation by breaking some of this stuff up.
@@ -426,14 +469,32 @@ millisecondsFromParts = function(row) {
   //var milliseconds = Math.floor(row.Time)  + row.SampleIndex
   
   var milliseconds = row.SampleIndex * (1000 / 200);
-  var seconds = Math.floor(row.Time);
-  var hours = seconds / 3600;
-  var minutes = (hours - Math.floor(hours)) * 60;
+  
 
+  var extractHours = function(timeColumn) {
+    var HOUR_SHIFT = 10000;
+
+    return timeColumn / HOUR_SHIFT;
+  }
+
+  var extractMinutes = function(timeColumn) {
+    var MINUTE_SHIFT = 100;
+    var temp = timeColumn / MINUTE_SHIFT;
+    return temp % MINUTE_SHIFT;
+  }
+
+  var seconds = Math.floor(row.Time);
+  var minutes = extractMinutes(row.Time);
+  var hours = extractHours(row.Time);
+
+  // Do the final extaction.
+  seconds = seconds % 100;
+
+  // Generate the object Date
   var tempDate = new Date(year, month - 1, date, hours, minutes, seconds, milliseconds);
 
+  // ask the object to return the number of milliseconds.
   return tempDate.getTime();
-  
 };
 
 
@@ -444,6 +505,7 @@ getDataFromDataBaseInRange = function (ms0, ms1, sensorNumber, sensorType, callb
 
     console.log("getDataFromDataBaseInRange");
     console.log(arguments);
+
 
     // NOTE: These table assignments are wrong, we must make sure that the year appropriate one
     // is used. The year appropriate one is the following:
@@ -463,6 +525,11 @@ getDataFromDataBaseInRange = function (ms0, ms1, sensorNumber, sensorType, callb
 
 
     var startDate = new Date(ms0);
+
+    // Ensuring the timestamp is properly sorted out, making the offset occur in the format that
+    // we know. How can we know if DST is enabled?
+    console.log(startDate.getTimezoneOffset());
+
     if (startDate.getFullYear() == 2012) {
 
       console.log("Need to use mutliple tables for the querying.");
@@ -536,8 +603,8 @@ sendDatabaseQuery = function(query, doWithResult) {
     //console.log("ROWS: ", rows);
     var send_object = rows.map(function (d) {
         //console.log("asdf: " + query.sensorNumber);
-        console.log("rows.map");
-        console.log(d);
+        //console.log("rows.map");
+        //console.log(d);
         
         var ms = 0;
         
@@ -545,8 +612,11 @@ sendDatabaseQuery = function(query, doWithResult) {
           console.log("Need to process the date/float combo for the dates.");
           ms = millisecondsFromParts(d);
           
+          
         } else {
-          console.log("Process the standard ms conversion (the older one)");
+          // The format contains just the Time column (which was actually a string
+          // in those instances.
+          //console.log("Process the standard ms conversion (the older one)");
           ms = dateAndSampleIndexStringToMilliseconds(d.Time + "", d.SampleIndex);
         }
         
@@ -562,6 +632,7 @@ sendDatabaseQuery = function(query, doWithResult) {
 
   mysqlconnection.end();
 }
+
 
 pad = function(integ) {
   var i = "" + integ;
@@ -593,12 +664,6 @@ getBwimEvents = function(date, startTime, endTime, callback) {
   // Therefore, if the time argument is specified for second accuracy right now, 
  
   // That should about do it.
-
-  console.log(year);
-
-  console.log(month);
-  console.log(pad(month));
-  
   var databaseName = "SPB_SHM_" + year + "MM" + pad(month);
 
   var day = date % 100;
@@ -611,10 +676,6 @@ getBwimEvents = function(date, startTime, endTime, callback) {
   // Shift each of them up by 1000 to account for the milliseconds argument.
   var startTimeArgument = (startTime * timeShift) + month * monthShift + day * dayShift;
   var endTimeArgument = (endTime * timeShift) + month * monthShift + day * dayShift;
-
-  // Just debugging outputs, remove this.
-  console.log("startTimeArgument = " + startTimeArgument);
-  console.log("endTimeArgument = " + endTimeArgument);
 
   var mysqlconnection = mysql.createConnection({
     host : 'shm1.ee.umanitoba.ca',
@@ -640,13 +701,10 @@ getBwimEvents = function(date, startTime, endTime, callback) {
       winston.info("QUERY returned " + rows.length + " rows");
     }
 
+    // There isn't muct too it.
     var send_object = rows.map(function(d) {
-      console.log("rows.map");
-      console.log(d);
-
       // Then start determining the event times/dates correspondingly.
       return d;
-      
     });
 
     // The completion routine can be called now to send the data back to the client
@@ -682,17 +740,11 @@ getSectionDataFromDatabase = function(args, callback) {
     "dd": ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8"]
   };
 
-  console.log("--- getSectionDataFromDatabase ---");
-  console.log(args);
-
-
   var section = "";
 
   if (args.section) {
     section = args.section.toLowerCase();
   }
-
-  console.log("section = " + section);
 
 
   // Function to compile the listing fo the columns
@@ -723,9 +775,6 @@ getSectionDataFromDatabase = function(args, callback) {
   var MONTH_SIZE = 100;
   var YEAR_SHIFT = MONTH_SIZE * MONTH_SHIFT;
 
-  console.log(startDate);
-  console.log(endDate);
-
   var startYear = Math.floor(startDate / YEAR_SHIFT);
   var endYear = Math.floor(endDate / YEAR_SHIFT);
 
@@ -734,9 +783,7 @@ getSectionDataFromDatabase = function(args, callback) {
   }
 
   startMonth = Math.floor(startDate / MONTH_SHIFT) % MONTH_SIZE;
-  console.log("startMonth = " + startMonth);
   endMonth = Math.floor(endDate / MONTH_SHIFT) % MONTH_SIZE;
-  console.log("endDate = " + endDate);
 
   // TODO winston logging instead, and return a value to the client that would
   // indicate to them that there is an error on the socket.
@@ -753,8 +800,6 @@ getSectionDataFromDatabase = function(args, callback) {
     password: fs.readFileSync(__dirname + '/ps').toString().trim(),
       database: databaseName
   });
-  // TODO we need to format the time reading as well.
-
 
   var timeShift = 1000000000;
   var startTime = startDate % DAY_SHIFT;
@@ -764,10 +809,7 @@ getSectionDataFromDatabase = function(args, callback) {
 
   // Time determination 
   var dateComponent = startDate % DAY_SHIFT;
-  console.log("dateComponent = " + dateComponent + ", startDate = " + startDate);
-  //var startTime = startDate - ((startDate % DAY_SHIFT) * DAY_SHIFT);
   var startTime = parseInt(args.start) - startDate * DAY_SHIFT;
-  //var endTime = endDate - ((endDate % DAY_SHIFT) * DAY_SHIFT);
   var endTime = parseInt(args.end) - endDate * DAY_SHIFT;
 
   var millisecondsComponent = startTime % MILLISECONDS_SIZE;
@@ -789,15 +831,9 @@ getSectionDataFromDatabase = function(args, callback) {
 
   endTime = Math.floor(endTime / MILLISECONDS_SIZE) + "." + millisecondsComponent;
 
-  console.log("startTime = " + startTime);
-  console.log("endTime = " + endTime);
-
   var query = "SELECT " + buildColumnList(section) + " FROM " + tableName +
     " WHERE Date >= " + startDate + " AND Date <= " + endDate + 
     " AND Time >= " + startTime + " AND Time <= " + endTime + ";";
-
-  console.log(query);
-
 
   connection.query(query, function(err, rows, fields) {
     if (err) {
@@ -811,13 +847,8 @@ getSectionDataFromDatabase = function(args, callback) {
     var send_object = rows.map(function(d) {
       var ms = 0;
 
-      // TODO figure out the translations.
-      console.log(d);
-
       // Then we need an object here that can easily translate for me and
       // get the data out.
-
-      // TODO need to convert the value to the proper ms (assume that it's UTC?)
 
       var sampleIndexMilliseconds = 5 * d.SampleIndex;
 
@@ -827,11 +858,8 @@ getSectionDataFromDatabase = function(args, callback) {
       var DATE_YEAR_SHIFT = DATE_MONTH_SHIFT * DATE_MONTH_SIZE;
       var recordYear = Math.floor(d.Date / DATE_YEAR_SHIFT);
       var recordMonth = Math.floor((d.Date % DATE_YEAR_SHIFT) / DATE_DAY_SIZE);
-      console.log(recordMonth);
 
       var recordDay = d.Date % DATE_MONTH_SHIFT;
-      console.log(recordDay);
-
 
       // Perform the time conversion now
       var recordMilliseconds = Math.floor(d.Time * 1000) % 1000; 
@@ -844,17 +872,12 @@ getSectionDataFromDatabase = function(args, callback) {
 
       var date = new Date(recordYear, recordMonth - 1, recordDay, recordHours, recordMinutes, recordSeconds, recordMilliseconds);
 
-      console.log(date);
-
       var returnData = {};
       SECTION_COLUMNS[section].forEach(function(element, index, array) {
         returnData[element] = d[element];
       });
 
       returnData.section = section;
-
-      console.log(returnData);
-
       returnData.ms = date.getTime();
 
       return returnData;  
