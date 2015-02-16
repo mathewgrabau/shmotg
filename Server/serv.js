@@ -2,6 +2,9 @@
 // 
 
 // {{{ SETUP
+
+var ENABLE_LOGGLY = false;
+
 var fs = require('fs');
 require("../binnedData.js");
 require("./database.js");
@@ -9,16 +12,18 @@ require("./couchAccess.js");
 _ = require("underscore");
 var winston = require("winston");
 
-require('winston-loggly');
+// Selectively require the information regarding loggly.
+if (ENABLE_LOGGLY){
+    require('winston-loggly');
+    require("./loggly-conf.js");
 
-require("./loggly-conf.js");
+    // Check to see if the configuration object is defined.
+    if (typeof loggly_configuration === 'undefined') {
+        throw "Loggly configuration not defined";
+    }
 
-// Check to see if the configuration object is defined.
-if (typeof loggly_configuration === 'undefined') {
-  throw "Loggly configuration not defined";
+    winston.add(winston.transports.Loggly, loggly_configuration);
 }
-
-winston.add(winston.transports.Loggly, loggly_configuration);
 
 red = '\033[31m';
 yellow = '\033[33m';
