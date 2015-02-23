@@ -1,5 +1,5 @@
 //
-// 
+//
 
 // {{{ SETUP
 
@@ -115,7 +115,7 @@ io.sockets.on('connection', function (socket) {
           }
 
           getBwimEvents(received.date, received.startTime, received.endTime, function (queryResult) {
-            
+
             console.log("time to send to the client!");
 
             winston.log('returning results for request' + id);
@@ -123,7 +123,7 @@ io.sockets.on('connection', function (socket) {
 
 
             var results = {
-              id: id, 
+              id: id,
               events: queryResult
             };
 
@@ -149,7 +149,7 @@ io.sockets.on('connection', function (socket) {
 
             case "eventdata":
               // This is a specific query that allows us to get the starting/ending date range in the more recent years, based on a specific range that // is offered up by the development inforamtion.
-              
+
 
               // Log in the reception of the request (TODO make this a tracing event though)
               winston.log(received);
@@ -162,7 +162,7 @@ io.sockets.on('connection', function (socket) {
 
 
               // Then we need to start pursuing the queries, recovering the data in the range that is specified
-              
+
 
               var result = {};
 
@@ -186,11 +186,11 @@ io.sockets.on('connection', function (socket) {
 
               // Iterate over the sections and process them accordingly.
               series(sectionQueries.shift(), getSectionDataFromDatabase, function(data) {
-                winston.info("Returning query result to the client for request id " + id); 
+                winston.info("Returning query result to the client for request id " + id);
                 result.id = id;
                 socket.emit("section_data", JSON.stringify(result));
               });
-              
+
 
               // No further processing to be done on this paricular request.
               return;
@@ -264,7 +264,7 @@ io.sockets.on('connection', function (socket) {
             var tmpData = binnedData(); // TODO TODO: this doesn't need to be a full-blown object...
 
             getDataFromDataBaseInRange(range[0], range[1], req.sensorNumber, req.sensorType, function (queryResult) {
-  
+
               //
                 // Bin the new data
                 console.log("- data received...");
@@ -314,6 +314,7 @@ io.sockets.on('connection', function (socket) {
                     argsList.push([req.sensorType, req.sensorNumber, keyList[j], req.bin_level, binContainers[i]]);
                 }
             }
+
 
             // TODO: func() should make sendo, and add it to bdtemp.
             var func = function (st, sn, k, l, d, callback) {

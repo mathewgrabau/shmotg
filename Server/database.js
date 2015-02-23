@@ -136,14 +136,19 @@ function combineWithoutDuplicates(arr1, arr2) {
 
 // NOTE: The sensor type is either strap or girder.
 // Depending on the sensor type, using an either G/S (or ESGgirder
-// or ESGstrap)
-makeQuery = function(a, b, letter, sensorNumber, sensorType) {
-  // @param   a   The milliseconds requested for the query
-  // @param   b   The milliseconds corresponding to the end time.
-  // @param   letter  Used for formatting and sending the query results (in the older)
-  // RETURNS: Object containing the following fields:
-  // column - the name of the column to inspect.
-  
+// or ESGstrap).
+
+/**
+ *
+ * @param a     The milliseconds requested for the query.
+ * @param b     The milliseconds corresponding for the query.
+ * @param letter    Used for formatting and sending the query results (in the older).
+ * @param sensorNumber  Which sensor should be queried for.
+ * @param sensorType    The type of sensor (strap/girder - currently just the girder is supported).
+ * @param schema        Which of the values of #SouthPerimeterSchemas is being used to complete the sensor.
+ * @returns {{query: string, table: string, column, sensorNumber: *, sensorType: *}}
+ */
+makeQuery = function(a, b, letter, sensorNumber, sensorType, schema) {
     var dtr = dt(a); // date to request
     var dtr2 = dt(b); // second date to request
 
@@ -161,34 +166,36 @@ makeQuery = function(a, b, letter, sensorNumber, sensorType) {
     var tableName;
 
     if (section === null) {
-      console.log("DETERMING THE SECTION AUTOMATICALLY");
+      console.log("DETERMINING THE SECTION AUTOMATICALLY");
       section = determineSection(a, sensorNumber);
 
       // The more recent ones are combined tables in the sections.
       // What table should we pull from
-      tableName = determineTableName(a, sensorNumber);
+      tableName = determineTableName(a, sensorNumber, schema);
     } else {
-      // Older ones follow a known pattern.
+      // Older ones follow a known pattern. Note that this is just used to interpret the following data properly.
+        // we should be able to get things going properly here.
       tableName = "SPBRTData_" + letter;
     }
 
 
-    var columnName = determineColumnName(a, sensorNumber);
+    var columnName = determineColumnName(a, sensorNumber, schema);
 
     console.log("Selecting column " + columnName + " from table " + tableName);
 
-    // NOTE: This column is not quite accurate, as the Time (and/or Date clause) must 
+    // NOTE: This column is not quite accurate, as the Time (and/or Date clause) must
     // be formatted porperly.
 
     // The date/time inputs are not formed to input properly.
     // When dealing with 2014 data, etc there are two fields to deal with:
-    // There is the requirement to update the values of the interfacing 
+    // There is the requirement to update the values of the interfacing
 
-
+    // Generating the where clause is quite difficult actually. Also the tables should be including the real-time data
+    // . They are currently not including that (at their loss in fact).
     var whereClause = generateWhereClause(a, b);
 
     console.log("whereClause = " + whereClause);
-    
+
     if (whereClause === null) {
       console.log("whereClause null, dynamic clause not available");
     } else {
@@ -497,7 +504,46 @@ millisecondsFromParts = function(row) {
   return tempDate.getTime();
 };
 
+/**
+ * The constants that represent the different schemas that are known in the application.
+ */
+var SouthPerimeterSchemas = {
+    Unknown: 0,
+    Schema2012_1: 1,
+    Schema2012_2: 2,
+    Schema2012_3: 3,
+    Schema2013_2: 4
+};
 
+/**
+ * Based on the date that is passed as a parameter, return a code representing the applicable schema. Use this
+ * code to determine the formatting/interpretation of the various columns.
+ * @param date
+ * @returns {number}
+ */
+var determineSchema = function(date) {
+    var schema = SouthPerimeterSchemas.Unknown;
+
+    if (date.getFullYear() == 2012) {
+        if (date.getMonth() <= 3) {    // javascript's 0-indexed months
+            schema = SouthPerimeterSchemas.Schema2012_1;
+        } else if (date.getMonth() <= 6) {  // the terminating month is July (7), but because of zero-index month in JS Date
+            schema = SouthPerimeterSchemas.Schema2012_2;
+        } else {
+            schema = SouthPerimeterSchemas.Schema2012_3;
+        }
+    } else if (date.getFullYear() == 2013) {
+        if (date.getMonth() <= 9) { // The terminating month is October (10), but because of zero-index month in JS Date.
+            schema = SouthPerimeterSchemas.Schema2012_3;
+        } else {
+            schema = SouthPerimeterSchemas.Schema2013_2;
+        }
+    } else if (date.getFullYear() >= 2014) {
+        schema = SouthPerimeterSchemas.Schema2013_2;
+    }
+
+    return schema;
+}
 
 // TODO: consider changing the ms0/ms1 parameters - that would likely yield much better results
 // for doing the selections.
@@ -519,35 +565,53 @@ getDataFromDataBaseInRange = function (ms0, ms1, sensorNumber, sensorType, callb
     // otherwise, we can accelerate the process and attempt to make the following 
     // things more efficiently done.
 
-
     var queries = [];
-    //var vals = ['1A','1B','1C','1D','1E','1F','0A','0B','0C','0D','0E','0F'];
-
-
     var startDate = new Date(ms0);
 
-    // Ensuring the timestamp is properly sorted out, making the offset occur in the format that
-    // we know. How can we know if DST is enabled?
-    console.log(startDate.getTimezoneOffset());
+    var schema = determineSchema(startDate);
+
+    switch (schema) {
+        case SouthPerimeterSchemas.Schema2012_1:
+            console.log("using multiple tables for the querying");
+
+            var suffixes = ["0A", "0B", "0C", "0D", "0E", "0F"];
+            for (var i = 0; i < suffixes.length; i++) {
+                queries.push(makeQuery(ms0, ms1, suffixes[i], sensorNumber, sensorType));
+            }
+
+            break;
+
+        case SouthPerimeterSchemas.Schema2012_2:
+
+            var suffixes = ["1A", "1B", "1C", "1D", "1E", "1F"];
+            for (var i = 0; i < suffixes.length; i++) {
+                queries.push(makeQuery(ms0, ms1, suffixes[i], sensorNumber, sensorType));
+            }
+
+            break;
+
+        case SouthPerimeterSchemas.Schema2012_3:
+            queries.push(makeQuery(ms0, ms1, null, sensorNumber, sensorType));
+            break;
+
+        default:
+            throw "Unknown schema " + schema + " for the date specified " + startDate;
+    }
+
 
     if (startDate.getFullYear() == 2012) {
-
       console.log("Need to use mutliple tables for the querying.");
       // Then determine if we need to be querying which tables here
-     
+
       if (startDate.getMonth() <= 3) {    // javascript's 0-indexed months
         console.log("0 based table names");
-        var suffixes = ["0A", "0B", "0C", "0D", "0E", "0F"];
-        for (var i = 0; i < suffixes.length; i++) {
-          queries.push(makeQuery(ms0, ms1, suffixes[i], sensorNumber, sensorType));
-        }
+
       } else if (startDate.getMonth() <= 6) {   // July was the last month for implementing that values
-        var suffixes = ["1A", "1B", "1C", "1D", "1E", "1F"];
-        for (var i = 0; i < suffixes.length; i++) {
-          queries.push(makeQuery(ms0, ms1, suffixes[i], sensorNumber, sensorType));
-        }
+
+      } else {
+          console.log("Using the normal table structure here (ensuring that")
       }
-    
+
     } else {
       // Modifying the function to just figure out the proper section on its own
       // Another helpful one would just be all of the data in the tables 
