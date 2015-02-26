@@ -142,7 +142,7 @@ function combineWithoutDuplicates(arr1, arr2) {
  *
  * @param a     The milliseconds requested for the query.
  * @param b     The milliseconds corresponding for the query.
- * @param letter    Used for formatting and sending the query results (in the older).
+ * @param letter    Used for formatting and sending the query results (in the older query types).
  * @param sensorNumber  Which sensor should be queried for.
  * @param sensorType    The type of sensor (strap/girder - currently just the girder is supported).
  * @param schema        Which of the values of #SouthPerimeterSchemas is being used to complete the sensor.
@@ -179,6 +179,7 @@ makeQuery = function(a, b, letter, sensorNumber, sensorType, schema) {
     }
 
     var columnName = determineColumnName(a, sensorNumber, schema);
+    var timeColumns = determineTimeColumns(schema);
 
     console.log("Selecting column " + columnName + " from table " + tableName);
 
@@ -206,9 +207,33 @@ makeQuery = function(a, b, letter, sensorNumber, sensorType, schema) {
     // TODO there is probably some much different formatting needed here.
     // This only works when Time is a character (I would think)
     if (whereClause != null) {
-      // TODO we need to do some adapting for the Date/Time to be able to turn these into a 
-      // date and time again.
-      query = "SELECT " + columnName + ', SampleIndex, Time, Date FROM ' + tableName + ' ' + whereClause;
+
+      console.log(timeColumns);
+
+      //if (timeColumns.prototype == Array.prototype) {
+        console.log("Dynamically selecting column names");
+        var columnString = "";
+
+        var i;
+
+        // Because of the handling, using this string is okay.
+        for (i = 0; i < timeColumns.length; i++) {
+          console.log("Adding " + timeColumns[i] + " to the query");
+
+          columnString += ", " + timeColumns[i];
+        }
+
+        // The column string already contains the comma that is required.
+        query = "SELECT " + columnName + ', Date, Time ' + columnString + " FROM " + tableName + ' ' + whereClause;
+
+        // Then append that into the query.
+      //} else {
+        // TODO we need to do some adapting for the Date/Time to be able to turn these into a
+        // date and time again.
+        //query = "SELECT " + columnName + ', SampleIndex, Time, Date FROM ' + tableName + ' ' + whereClause;
+      //}
+
+      console.log(query);
     } else {
       var queryHead = 'SELECT ' + columnName + ', SampleIndex, Time FROM ' + tableName + ' WHERE Time BETWEEN';
       var query1 = ' "' + dtr.getFullYear() +
@@ -275,41 +300,70 @@ var determineSection = function(sensorNumber) {
 
 };
 
+/**
+ * Generate schema-specific time column(s) are applicable that needs to be selected in a query.
+ * This workaround ensures that precision, where significant, is not lost.
+ *
+ * @param schema Which of the schema formats (the enumeration) to use in the selections.
+ * @returns {string[]}
+ */
+var determineTimeColumns = function(schema) {
+  switch (schema) {
+    case SouthPerimeterSchemas.Schema2013_2:
+      // The AdjustedTime column then contains values for the
+      return ["CAST((ROUND(TIME*1000)+(SampleIndex * 5)) AS UNSIGNED) AS AdjustedTime"];
+      break;
 
-var determineColumnName = function(ms, sensorNumber) {
+    default:
+      return ["Time", "SampleIndex"];
+  }
+}
+
+var determineColumnName = function(ms, sensorNumber, schema) {
   // Map the column name according to the date that is attempting
   // RETURNS: the formatted string according to the sensorNumber
   // and that matches the database for the Date corresponding 
   // to ms parameter.
-  
-  var d = new Date(ms);   // Determine the date of the event now.
-  var year = d.getFullYear();
 
-  if (year >= 2014) {
-    // Depending on the month depends on the rule for formatting
-    return "G" + sensorNumber;
-  } else if (year == 2013) {
-    // October (month 10) was the last month that things were like this.
-    // The Date.getMonth() function returns 0-11 for the month number though.
-    if (d.getMonth() <= 9) {
-      return "ESGgirder" + sensorNumber;
-    } else {
-      return "G" + sensorNumber;
+
+    switch (schema) {
+
+        case SouthPerimeterSchemas.Schema2013_2:
+            return "G" + sensorNumber;
+
+
+        default:
+            // TODO port over the remainder of the schemas there
+
+            var d = new Date(ms);   // Determine the date of the event now.
+            var year = d.getFullYear();
+
+            if (year >= 2014) {
+                // Depending on the month depends on the rule for formatting
+                return "G" + sensorNumber;
+            } else if (year == 2013) {
+                // October (month 10) was the last month that things were like this.
+                // The Date.getMonth() function returns 0-11 for the month number though.
+                if (d.getMonth() <= 9) {
+                    return "ESGgirder" + sensorNumber;
+                } else {
+                    return "G" + sensorNumber;
+                }
+            } else {
+                // Fall back to a default here (at least there is something to select then)
+                return "ESGgirder" + sensorNumber;
+            }
+
+            break;
     }
-  } else {
-    // Fall back to a default here (at least there is something to select then)
-    return "ESGgirder" + sensorNumber;
-  }
 };
 
 
-var determineTableName = function (ms, sensorNumber) {
+var determineTableName = function (ms, sensorNumber, schema) {
   // Parses the date and determines the correct database and 
   // the connection infromation.
   // RETURNS: table name for years 2014-
   var d = new Date(ms);
-  //if (d.get^
-
 
   // The section is common in many of the values
   var section = determineSection(sensorNumber);
@@ -319,7 +373,13 @@ var determineTableName = function (ms, sensorNumber) {
   // The table name is SPBData_Raw_AA, etc
   // For the years starting from 2012 to 2013, the years are 
   // SPBRTData_Raw_AA, etc
-  
+
+
+    // TODO finish off this switch statement for implementation
+    switch (schema){
+
+    }
+
 
   var year = d.getFullYear();
 
@@ -542,13 +602,9 @@ dateAndSampleIndexStringToMilliseconds = function (dateStr, sampleIndex) {
  *              processed here now.
  */
 millisecondsFromParts = function(row) {
-  
   // These functions aid in the implementation by breaking some of this stuff up.
 
-    console.log(row.Date);
-    console.log(row.Time);
-
-  var extractYear = function(dateColumn) { 
+  var extractYear = function(dateColumn) {
     var YEAR_SHIFT = 10000;
     return Math.floor(dateColumn / YEAR_SHIFT);
   };
@@ -569,57 +625,55 @@ millisecondsFromParts = function(row) {
   var month = extractMonth(row.Date);
   var date = extractDate(row.Date);
 
-    console.log(year);
-    console.log(month);
-    console.log(date);
-  
-  // Compute the number of milliseconds 
-  // An example value is 21005.3 (21005 seconds + 300 milliseconds)
-  //var milliseconds = Math.floor(row.Time)  + row.SampleIndex
-
-    // Note that is not correct for the milliseconds, the milliseconds are actually the number of seconds in the decimal portion.
-    // The number of milliseconds is determined by selecting the description appropriately.
-  var milliseconds = (row.SampleIndex * (1000 / 200));
-
-
-    // Compute the time adjusted for the values.
-    var actualTime = row.Time + (row.SampleIndex / 200);
-
-    console.log(actualTime);
-
-    // Need a total number of milliseconds
-    milliseconds = (row.Time * 1000) % (100 * 1000) + row.SampleIndex * 5;
+  // Compute the number of milliseconds
 
   var extractHours = function(timeColumn) {
-    var HOUR_SHIFT = 10000;
-
-    return Math.floor(timeColumn / HOUR_SHIFT);
-  }
+    // The assumption is HHMMSSFFF (as an integer)
+    var HOUR_SHIFT = 10000000;
+    var temp = Math.floor(timeColumn / HOUR_SHIFT);
+    return temp;
+  };
 
   var extractMinutes = function(timeColumn) {
-    var MINUTE_SHIFT = 100;
+    // The assumption is HHMMSSFFF (as an integer)
+    var MINUTE_SHIFT = 100000;
+    var MINUTE_SIZE = 100;
     var temp = timeColumn / MINUTE_SHIFT;
       // Ensure that the decimal portion is removed from the sorting there.
-    return Math.floor(temp % MINUTE_SHIFT);
+    return Math.floor(temp % MINUTE_SIZE);
+  };
+
+  var extractSeconds = function(timeColumn) {
+    // The assumption is HHMMSSFFF (as an integer)
+    var SECONDS_SHIFT = 1000;
+    var SECONDS_SIZE = 100;
+    var temp = timeColumn / SECONDS_SHIFT;
+    temp = Math.floor(temp % SECONDS_SIZE);
+    return temp;
+  };
+
+  var extractMilliseconds = function(timeColumn) {
+    var MILLISECONDS_SIZE = 1000;
+    var temp = Math.floor(timeColumn % MILLISECONDS_SIZE);
+    return temp;
+  };
+
+  // Performing the time extraction for the values that
+  var minutes = extractMinutes(row.AdjustedTime);
+  var hours = extractHours(row.AdjustedTime);
+  var seconds = extractSeconds(row.AdjustedTime);
+  var milliseconds = extractMilliseconds(row.AdjustedTime);
+
+  // Must ensure that it aligns on the 5 second interval boundary
+  milliseconds += 5 - (milliseconds % 5);
+
+  // For the milliseconds, ensure that it's offset the nearest
+  while (milliseconds >= 1000) {
+    milliseconds -= 1000;
   }
-
-  //var seconds = Math.floor(row.Time);
-    var SECONDS_SIZE = 100; // There are two digits assigned to the seconds. This takes care of it now.
-    var seconds = Math.floor(actualTime % SECONDS_SIZE);
-    // Multiply in the new multiple seconds.
-    milliseconds = Math.floor((actualTime * 1000) % 1000);
-    console.log(milliseconds);
-  var minutes = extractMinutes(actualTime);
-  var hours = extractHours(actualTime);
-    console.log(seconds);
-    console.log(minutes);
-
-    console.log(hours); // This value looks right, so what is happening that is causing this to roll back so much???
 
   // Generate the object Date (remembering that the JavaScript date object has a zero-based index for the month portion.
   var tempDate = new Date(year, month - 1, date, hours, minutes, seconds, milliseconds);
-
-    console.log(tempDate + " " + tempDate.getMilliseconds());
 
   // ask the object to return the number of milliseconds.
   return tempDate.getTime();
@@ -762,24 +816,23 @@ sendDatabaseQuery = function(query, doWithResult) {
     if (rows.length === 0) {
       winston.warn("QUERY " + query + " returned 0 rows");
     } else {
-      winston.info("QUERY " + query + " returned " + rows.length + " rows");
+      winston.warn("QUERY " + query + " returned " + rows.length + " rows");
     }
 
     //console.log("ROWS: ", rows);
     var send_object = rows.map(function (d) {
         var ms = 0;
 
+        // The d.Time was selected (included in the query along with the adjusted time).
         if (d.Date !== undefined && d.Time !== undefined) {
           ms = millisecondsFromParts(d);
-          
-          
         } else {
           // The format contains just the Time column (which was actually a string
           // in those instances.
           //console.log("Process the standard ms conversion (the older one)");
           ms = dateAndSampleIndexStringToMilliseconds(d.Time + "", d.SampleIndex);
         }
-        
+
         // TODO this won't actually work right at all
         return { val: d[query.column],
                  ms: ms
