@@ -65,6 +65,9 @@ window.addEventListener('load', function() {
     <input type="checkbox" id="edit" value="edit"/><label for="edit">Edit</label>
     </br> <!-- to keep the controls on the next line -->
 
+    <input type="button" id="image_list" value="Images" />
+    </br>
+
     <div id="slider_container">
     </div>
 
@@ -83,6 +86,19 @@ window.addEventListener('load', function() {
 <div id="edit_swap"></div>
 <div id="edit_minus"></div>
 <div id="edit_mult"></div>
+
+<div id="images_dialog" style="z-index: 100;display: none;">
+    Here is the images list.
+    <p>The current title</p>
+    <div>
+        <input type="button" id="image_prev" value="<" />
+        <span id="image_title">name/title of the current image</span>
+        <input type="button" id="image_next" value=">" />
+    </div>
+    <div id="current_image">
+
+    </div>
+</div>
 
 <!--<button id='fade' onclick='fade()'>fade</button>-->
 
@@ -107,7 +123,10 @@ window.addEventListener('load', function() {
 <script src="multiData.js"></script>
 <script src="./slider.js"></script>
 <script src="binnedChart.js"></script>
+<script src="imageData.js"></script>
+<script src="imageLine.js"></script>
 <script src="bridgeCharts.js"></script>
+<script src="imageList.js"></script>
 <!-- JAVASCRIPT LOADING }}}-->
 </html>
 
